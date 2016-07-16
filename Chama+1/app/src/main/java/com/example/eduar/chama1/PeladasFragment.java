@@ -95,6 +95,12 @@ public class PeladasFragment extends Fragment implements OnMapReadyCallback{
         gMapView.onLowMemory();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        gMapView.onPause();
+    }
+
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {

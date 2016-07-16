@@ -2,7 +2,10 @@ package com.example.eduar.chama1;
 
 
 
+import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -95,11 +99,17 @@ public class PeladasFragment extends Fragment implements OnMapReadyCallback{
         @Override
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+
+            TextView locationTv = (TextView) getView().findViewById(R.id.lat_long);
+            locationTv.setText("Latitude:" + loc.latitude + ", Longitude:" + loc.longitude);
+
             //Marker mMarker = gMap.addMarker(new MarkerOptions().position(loc));
             if(gMap != null){
                 gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
             }
         }
     };
+
+
 
 }

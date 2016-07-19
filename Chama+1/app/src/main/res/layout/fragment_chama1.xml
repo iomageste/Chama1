@@ -4,14 +4,106 @@
     android:layout_height="match_parent"
     tools:context="com.example.eduar.chama1.Chama1Fragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Chama+1 Fragment"
-        android:gravity="center"
-        android:textSize="30dp"
-        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Chama +"
+        android:id="@+id/labelChamaMais"
+        android:layout_marginTop="150dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <EditText
+        android:layout_width="68dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textChamaMais"
+        android:layout_gravity="center_horizontal|top"
+        android:text="1"
+        android:layout_marginTop="140dp"
+        android:layout_marginLeft="80dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Tipo"
+        android:id="@+id/labelTipo"
+        android:layout_marginTop="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <EditText
+        android:layout_width="68dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textTipo"
+        android:layout_gravity="center_horizontal|top"
+        android:text="1"
+        android:layout_marginTop="190dp"
+        android:layout_marginLeft="80dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Area (km)"
+        android:id="@+id/labelArea"
+        android:layout_marginTop="250dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <SeekBar
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekArea"
+        android:layout_marginTop="290dp"
+        android:layout_gravity="center_horizontal"
+        android:max="100"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="2                     10                    100"
+        android:id="@+id/labelAreaValores"
+        android:layout_marginTop="310dp"
+        android:layout_gravity="center_horizontal"
+         />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Começa em (min)"
+        android:id="@+id/labelComecaEm"
+        android:layout_marginTop="370dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="50dp" />
+
+    <SeekBar
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekComecaEm"
+        android:layout_marginTop="410dp"
+        android:layout_gravity="center_horizontal"
+        android:max="120" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="5                     60                    120"
+        android:id="@+id/labelComecaEmValores"
+        android:layout_marginTop="440dp"
+        android:layout_gravity="center_horizontal"
         />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buscar"
+        android:id="@+id/buttonBuscar"
+        android:layout_marginTop="490dp"
+        android:layout_gravity="center_horizontal" />
 
 </FrameLayout>

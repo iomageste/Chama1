@@ -106,8 +106,12 @@ public class PeladasFragment extends Fragment implements OnMapReadyCallback{
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 
+            // Exemplo de calculo de distancia entre dois pontos, resultado em results[0]
+            float[] results = new float[1];
+            Location.distanceBetween(location.getLatitude(), location.getLongitude(), -21.751809, -43.353663, results);
+
             TextView locationTv = (TextView) getView().findViewById(R.id.lat_long);
-            locationTv.setText("Latitude:" + loc.latitude + ", Longitude:" + loc.longitude);
+            locationTv.setText("Latitude:" + loc.latitude + ", Longitude:" + loc.longitude+", Distance:"+results[0]);
 
             //Marker mMarker = gMap.addMarker(new MarkerOptions().position(loc));
             if(gMap != null){

@@ -33,6 +33,7 @@ public class MainActivity extends FragmentActivity {
         viewPagerAdapter.addFragments(new ConfigFragment(), "Config");
         viewPagerAdapter.addFragments(new SolicitacoesFragment(), "Solicitações");
         viewPagerAdapter.addFragments(new RecentesFragment(), "Recentes");
+        viewPagerAdapter.addFragments(new PerfilFragment(), "Perfil");
 
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);

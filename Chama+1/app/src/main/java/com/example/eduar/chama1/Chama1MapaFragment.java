@@ -1,19 +1,13 @@
 package com.example.eduar.chama1;
 
 
-
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
@@ -28,7 +22,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -38,7 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PeladasFragment extends Fragment implements
+public class Chama1MapaFragment extends Fragment implements
         OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
@@ -55,7 +48,7 @@ public class PeladasFragment extends Fragment implements
 
         @Override
         public View getInfoWindow(Marker marker) {
-                return null;
+            return null;
         }
 
         @Override
@@ -95,7 +88,7 @@ public class PeladasFragment extends Fragment implements
     private GoogleMap gMap = null;
     Marker myMarker;
 
-    public PeladasFragment() {
+    public Chama1MapaFragment() {
         // Required empty public constructor
     }
 
@@ -202,8 +195,7 @@ public class PeladasFragment extends Fragment implements
         // insere no banco
         // solicitante_id (usuario logado), candidato_id (usuario associado ao marker),
         // aprovado (false, até o outro solicitante dar o ok)
-        ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
-        view.setCurrentItem(3, true);
     }
 
 }
+

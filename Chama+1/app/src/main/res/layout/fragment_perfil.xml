@@ -1,0 +1,64 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.eduar.chama1.PerfilFragment">
+
+    <ImageView
+        android:layout_width="144dp"
+        android:layout_height="144dp"
+        android:id="@+id/imageView"
+        android:layout_marginTop="110dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/default_profile_image" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Nome: "
+        android:id="@+id/labelNome"
+        android:layout_marginTop="250dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textNome"
+        android:layout_gravity="center_horizontal|top"
+        android:text=" "
+        android:layout_marginTop="240dp"
+        android:layout_marginLeft="60dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Telefone"
+        android:id="@+id/labelTelefone"
+        android:layout_marginTop="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textTelefone"
+        android:layout_gravity="center_horizontal|top"
+        android:text=" "
+        android:layout_marginTop="290dp"
+        android:layout_marginLeft="60dp" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Salvar"
+        android:id="@+id/buttonSalvar"
+        android:layout_marginTop="490dp"
+        android:layout_gravity="center_horizontal" />
+
+
+
+</FrameLayout>

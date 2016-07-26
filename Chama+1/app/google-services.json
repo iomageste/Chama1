@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "784054919943",
+    "firebase_url": "https://chama1-e883c.firebaseio.com",
+    "project_id": "chama1-e883c",
+    "storage_bucket": "chama1-e883c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784054919943:android:594c77e44459e4eb",
+        "android_client_info": {
+          "package_name": "com.example.eduar.chama1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "784054919943-tk15cgtechas3sp28ve5thd9amgj5fuk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmJPA8o7qJK8j2TsVwgWkIaISxx0FshiI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

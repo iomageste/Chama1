@@ -1,18 +1,17 @@
 package com.example.eduar.model;
 
-import io.realm.RealmObject;
+
 
 /**
  * Created by eduar on 7/19/2016.
  */
-public class User extends RealmObject {
+public class User{
 
-    private int id;
+    private String username;
     private String nome;
     private String password;
     private String telefone;
-    private String email;
-    private Boolean notificacoes;
+    private boolean notificacoes;
     private int areaBusca;
 
     public User() {
@@ -24,12 +23,20 @@ public class User extends RealmObject {
         this.telefone = telefone;
     }
 
-    public int getId() {
-        return id;
+    public User(String username, String nome, String password, String telefone, int areaBusca) {
+        this.username = username;
+        this.nome = nome;
+        this.password = password;
+        this.telefone = telefone;
+        this.areaBusca = areaBusca;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getNome() {
@@ -56,13 +63,9 @@ public class User extends RealmObject {
         this.telefone = telefone;
     }
 
-    public Boolean getNotificacoes() {
-        return notificacoes;
-    }
+    public boolean isNotificacoes() { return notificacoes; }
 
-    public void setNotificacoes(Boolean notificacoes) {
-        this.notificacoes = notificacoes;
-    }
+    public void setNotificacoes(boolean notificacoes) { this.notificacoes = notificacoes; }
 
     public int getAreaBusca() {
         return areaBusca;
@@ -72,11 +75,4 @@ public class User extends RealmObject {
         this.areaBusca = areaBusca;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

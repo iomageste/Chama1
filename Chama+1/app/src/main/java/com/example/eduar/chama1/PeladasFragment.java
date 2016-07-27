@@ -22,6 +22,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eduar.model.Busca;
+import com.example.eduar.model.User;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,6 +40,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +52,7 @@ public class PeladasFragment extends Fragment implements
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
+    private List<Busca> peladas;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         //private final View mWindow;
@@ -106,6 +116,28 @@ public class PeladasFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_peladas, container, false);
 
+        peladas = new ArrayList<>();
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+
+        myFirebaseRef.child("buscas").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                //Toast.makeText(getContext(),"There are " + snapshot.getChildrenCount() + " users", Toast.LENGTH_SHORT).show();
+
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    Busca busca = postSnapshot.getValue(Busca.class);
+                    if(busca != null){
+                        peladas.add(busca);
+                    }
+                    /*User user = postSnapshot.getValue(User.class);
+                    String resultado = user.getNome()+user.getTelefone();
+                    Toast.makeText(getContext(), resultado, Toast.LENGTH_SHORT).show();*/
+
+                }
+            }
+            @Override public void onCancelled(FirebaseError error) { }
+        });
+
         gMapView = (MapView) view.findViewById(R.id.map);
         gMapView.onCreate(savedInstanceState);
         gMapView.getMapAsync(this);
@@ -167,20 +199,21 @@ public class PeladasFragment extends Fragment implements
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 
-            // Exemplo de calculo de distancia entre dois pontos, resultado em results[0]
-            float[] results = new float[1];
-            Location.distanceBetween(location.getLatitude(), location.getLongitude(), -21.751809, -43.353663, results);
-            TextView locationTv = (TextView) getView().findViewById(R.id.lat_long);
-            locationTv.setText("Latitude:" + loc.latitude + ", Longitude:" + loc.longitude+", Distance:"+results[0]);
+            for(Busca pelada: peladas){
+                float[] results = new float[1];
+                Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                        pelada.getLatitude(), pelada.getLongitude(), results);
 
-            int height = 100;
-            int width = 100;
-            BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
-            Bitmap b=bitmapdraw.getBitmap();
-            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                int height = 100;
+                int width = 100;
+                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
+                Bitmap b=bitmapdraw.getBitmap();
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-            LatLng myLocal = new LatLng( -21.751809, -43.353663);
-            myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("Luiz Vinicius").snippet("Faltando: 3, Tipo: Quadra, Começa em: 30m").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
+                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet("Faltando: "+pelada.getUsuariosFaltando()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+
+            }
 
             //Marker mMarker = gMap.addMarker(new MarkerOptions().position(loc));
             if(gMap != null){

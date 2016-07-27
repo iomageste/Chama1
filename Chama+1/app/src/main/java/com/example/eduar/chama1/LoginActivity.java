@@ -26,6 +26,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.eduar.model.User;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +43,7 @@ import java.util.List;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
+    private User myuser;
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -53,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private final boolean authOk = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,6 +276,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (InterruptedException e) {
                 return false;
             }
+
+            Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
+            Query queryRef = myFirebaseRef.orderByChild("username").equalTo(mEmail);
+
+            boolean authOK = false;
+
+            queryRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot snapshot, String previousChild) {
+
+                }
+
+                @Override public void onChildRemoved(DataSnapshot dataSnapshot) { }
+                @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if(user != null)
+                        Toast.makeText(getApplicationContext(), user.getNome()+user.getTelefone(), Toast.LENGTH_SHORT).show();
+                        myuser = new User();
+                    User test;
+                }
+                @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+                @Override public void onCancelled(FirebaseError firebaseError) { }
+            });
+
+
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");

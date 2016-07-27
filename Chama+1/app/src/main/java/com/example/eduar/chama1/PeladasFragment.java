@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eduar.model.Busca;
+import com.example.eduar.model.Solicitacao;
 import com.example.eduar.model.User;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -209,8 +210,6 @@ public class PeladasFragment extends Fragment implements
         @Override
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-            novasPeladas.size();
-            //for(int i = novasPeladas.size()-1; i >= 0; i--){
 
              for(Busca pelada: novasPeladas){
                  for (String username :marcadoresPeladas.keySet()) {
@@ -253,9 +252,11 @@ public class PeladasFragment extends Fragment implements
     @Override
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(getContext(),  "Solicitação Enviada", Toast.LENGTH_SHORT).show();
-        // insere no banco
-        // solicitante_id (usuario logado), candidato_id (usuario associado ao marker),
-        // aprovado (false, até o outro solicitante dar o ok)
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+
+        Solicitacao solicitacao = new Solicitacao("eduardo", marker.getTitle());
+        myFirebaseRef.child("solicitacoes").child("eduardo-"+marker.getTitle()).setValue(solicitacao);
+
         ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
         view.setCurrentItem(3, true);
     }

@@ -8,7 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.eduar.model.Busca;
 import com.example.eduar.model.Solicitacao;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -19,6 +24,7 @@ import java.util.ArrayList;
 public class SolicitacoesFragment extends Fragment {
 
     ListView listSolicitacoes;
+    SolicitacoesAdapter adapter;
 
     public SolicitacoesFragment() {
         // Required empty public constructor
@@ -34,15 +40,25 @@ public class SolicitacoesFragment extends Fragment {
         listSolicitacoes =  (ListView) view.findViewById(R.id.listSolicitacoes);
 
         ArrayList<Solicitacao> solicitacoes = new ArrayList<>();
-        SolicitacoesAdapter adapter = new SolicitacoesAdapter(getContext(), solicitacoes);
+        adapter = new SolicitacoesAdapter(getContext(), solicitacoes);
 
         listSolicitacoes.setAdapter(adapter);
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+        myFirebaseRef.child("solicitacoes").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    adapter.clear();
+                    for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                        Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
+                        if (solicitacao != null) {
+                            adapter.add(solicitacao);
+                        }
+                    }
 
-        Solicitacao solicitacao1 = new Solicitacao(1, 2);
-        Solicitacao solicitacao2 = new Solicitacao(1, 3);
+                }
 
-        adapter.add(solicitacao1);
-        adapter.add(solicitacao2);
+                @Override public void onCancelled(FirebaseError error) { }
+        });
 
         return view;
     }

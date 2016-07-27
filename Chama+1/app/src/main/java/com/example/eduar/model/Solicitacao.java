@@ -5,34 +5,34 @@ import io.realm.RealmObject;
 /**
  * Created by eduar on 7/19/2016.
  */
-public class Solicitacao extends RealmObject {
-    private int solicitante_id;
-    private int busca_user_id;
+public class Solicitacao {
+    private String solicitante_username;
+    private String username_busca;
     private boolean aprovado;
 
     public Solicitacao() {
 
     }
 
-    public Solicitacao(int solicitante_id, int busca_user_id) {
-        this.solicitante_id = solicitante_id;
-        this.busca_user_id = busca_user_id;
+    public Solicitacao(String solicitante_username, String username_busca) {
+        this.solicitante_username = solicitante_username;
+        this.username_busca = username_busca;
     }
 
-    public int getSolicitante_id() {
-        return solicitante_id;
+    public String getSolicitante_username() {
+        return solicitante_username;
     }
 
-    public void setSolicitante_id(int solicitante_id) {
-        this.solicitante_id = solicitante_id;
+    public void setSolicitante_username(String solicitante_username) {
+        this.solicitante_username = solicitante_username;
     }
 
-    public int getBusca_user_id() {
-        return busca_user_id;
+    public String getUsername_busca() {
+        return username_busca;
     }
 
-    public void setBusca_user_id(int busca_user_id) {
-        this.busca_user_id = busca_user_id;
+    public void setUsername_busca(String username_busca) {
+        this.username_busca = username_busca;
     }
 
     public boolean isAprovado() {

@@ -32,7 +32,7 @@ public class SolicitacoesAdapter  extends ArrayAdapter<Solicitacao> {
         TextView userName = (TextView) convertView.findViewById(R.id.userName);
         TextView userTelefone = (TextView) convertView.findViewById(R.id.userTelefone);
         // Populate the data into the template view using the data object
-        userName.setText(String.valueOf(solicitacao.getBusca_user_id()));
+        userName.setText(String.valueOf(solicitacao.getUsername_busca()));
         String pendente = (solicitacao.isAprovado() ? "Solicitação aprovada!": "Solicitação pendente...");
         userTelefone.setText(pendente);
         // Return the completed view to render on screen

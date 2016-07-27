@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class MainActivity extends FragmentActivity {
 
     Toolbar toolbar;
@@ -16,17 +18,20 @@ public class MainActivity extends FragmentActivity {
     ViewPager viewPager;
     ViewPagerAdapter viewPagerAdapter;
     public static FragmentManager fragmentManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         //toolbar = (Toolbar)findViewById(R.id.toolBar);
         //setSupportActionBar(toolbar);
 
-        tabLayout = (TabLayout)findViewById(R.id.tabLayout);
-        viewPager = (ViewPager)findViewById(R.id.viewPager);
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPagerAdapter.addFragments(new PeladasFragment(), "Peladas");
         viewPagerAdapter.addFragments(new Chama1Fragment(), "Chama+1");
@@ -39,6 +44,7 @@ public class MainActivity extends FragmentActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         fragmentManager = getSupportFragmentManager();
+
 
     }
 }

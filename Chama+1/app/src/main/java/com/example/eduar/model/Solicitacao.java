@@ -1,9 +1,11 @@
 package com.example.eduar.model;
 
+import io.realm.RealmObject;
+
 /**
  * Created by eduar on 7/19/2016.
  */
-public class Solicitacao {
+public class Solicitacao extends RealmObject {
     private int solicitante_id;
     private int busca_user_id;
     private boolean aprovado;

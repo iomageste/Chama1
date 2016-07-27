@@ -41,7 +41,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -52,7 +54,8 @@ public class PeladasFragment extends Fragment implements
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
-    private List<Busca> peladas;
+    private List<Busca> novasPeladas;
+    private Map<String, Marker> marcadoresPeladas;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         //private final View mWindow;
@@ -116,24 +119,32 @@ public class PeladasFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_peladas, container, false);
 
-        peladas = new ArrayList<>();
+        novasPeladas = new ArrayList<>();
+        marcadoresPeladas = new HashMap<String, Marker>();
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
 
         myFirebaseRef.child("buscas").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 //Toast.makeText(getContext(),"There are " + snapshot.getChildrenCount() + " users", Toast.LENGTH_SHORT).show();
-
+                novasPeladas.clear();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
-                    Busca busca = postSnapshot.getValue(Busca.class);
-                    if(busca != null){
-                        peladas.add(busca);
+                    Busca pelada = postSnapshot.getValue(Busca.class);
+                    if(pelada != null){
+                        novasPeladas.add(pelada);
                     }
+                }
+                    /*if(nova_pelada != null){
+                        Busca pelada = peladaExistente(nova_pelada);
+                        if(pelada != null)
+                            novasPeladas.remove(pelada);
+                        novasPeladas.add(nova_pelada);
+                    }*/
                     /*User user = postSnapshot.getValue(User.class);
                     String resultado = user.getNome()+user.getTelefone();
                     Toast.makeText(getContext(), resultado, Toast.LENGTH_SHORT).show();*/
 
-                }
+
             }
             @Override public void onCancelled(FirebaseError error) { }
         });
@@ -198,8 +209,17 @@ public class PeladasFragment extends Fragment implements
         @Override
         public void onMyLocationChange(Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            novasPeladas.size();
+            //for(int i = novasPeladas.size()-1; i >= 0; i--){
 
-            for(Busca pelada: peladas){
+             for(Busca pelada: novasPeladas){
+                 for (String username :marcadoresPeladas.keySet()) {
+                     if(pelada.getUsername().equals(username)) {
+                         marcadoresPeladas.get(username).remove();
+                         break;
+                     }
+                 }
+
                 float[] results = new float[1];
                 Location.distanceBetween(location.getLatitude(), location.getLongitude(),
                         pelada.getLatitude(), pelada.getLongitude(), results);
@@ -212,6 +232,7 @@ public class PeladasFragment extends Fragment implements
 
                 LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
                 myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet("Faltando: "+pelada.getUsuariosFaltando()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                marcadoresPeladas.put(pelada.getUsername(), myMarker);
 
             }
 

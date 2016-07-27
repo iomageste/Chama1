@@ -20,6 +20,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eduar.model.Busca;
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -90,7 +92,12 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                 String dados = "Chama+"+chamaMais+", Tipo:"+tipo;
                 dados += ", Area:"+seekArea.getProgress();
                 dados += ", ComecaEm:"+seekComecaEm.getProgress();
-                Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
+                Busca busca = new Busca("eduardo", chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
+                //Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
+                Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+                myFirebaseRef.child("buscas").child("eduardo").setValue(busca);
+
                 /*getFragmentManager()
                         .beginTransaction()
                         .replace(R.id.viewPager, new Chama1MapaFragment())

@@ -47,9 +47,8 @@ public class SolicitacoesAdapter  extends ArrayAdapter<Solicitacao> {
         userTelefone.setText(pendente);
 
         if(solicitacao.isAprovado()){
-            Toast.makeText(getContext(), "Buscando usuario", Toast.LENGTH_SHORT).show();
             Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-            Query queryRef = myFirebaseRef.orderByChild("username").equalTo("mageste");
+            Query queryRef = myFirebaseRef.orderByChild("username").equalTo(solicitacao.getUsername_busca());
 
             queryRef.addChildEventListener(new ChildEventListener() {
                 @Override

@@ -32,7 +32,7 @@ public class PerfilFragment extends Fragment {
     String telefone;
     Button buttonSalvar;
     View view;
-    String currentUser;
+    User currentUser;
 
     public PerfilFragment() {
         // Required empty public constructor
@@ -44,7 +44,8 @@ public class PerfilFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_perfil, container, false);
-        currentUser = getResources().getString(R.string.current_user);
+
+        currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
 
         editUserName = (EditText) view.findViewById(R.id.textNome);
         editTelefone = (EditText) view.findViewById(R.id.textTelefone);
@@ -52,7 +53,7 @@ public class PerfilFragment extends Fragment {
         addListenerOnButton(view);
 
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser);
+        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser.getUsername());
 
         queryRef.addChildEventListener(new ChildEventListener() {
             @Override

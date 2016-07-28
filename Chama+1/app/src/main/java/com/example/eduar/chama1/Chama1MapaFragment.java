@@ -1,6 +1,8 @@
 package com.example.eduar.chama1;
 
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -8,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.eduar.model.Busca;
 import com.example.eduar.model.Solicitacao;
+import com.example.eduar.model.User;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -53,7 +57,7 @@ public class Chama1MapaFragment extends Fragment implements
     private Map<String, Marker> marcadoresPeladeiros;
     LatLng currentLoc;
     int areaBusca;
-    String currentUser;
+    User currentUser;
     int usuariosFaltando;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
@@ -120,7 +124,8 @@ public class Chama1MapaFragment extends Fragment implements
 
         areaBusca = Integer.parseInt(getArguments().getString("AreaBusca"));
         usuariosFaltando = Integer.parseInt(getArguments().getString("Chama+"));
-        currentUser = getResources().getString(R.string.current_user);
+        //currentUser = getResources().getString(R.string.current_user);
+        currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
 
         novosPeladeiros = new ArrayList<>();
         marcadoresPeladeiros = new HashMap<String, Marker>();
@@ -133,7 +138,7 @@ public class Chama1MapaFragment extends Fragment implements
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                     Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
                     if(solicitacao != null
-                            && !solicitacao.getSolicitante_username().equals(currentUser)
+                            && !solicitacao.getSolicitante_username().equals(currentUser.getUsername())
                             && !solicitacao.isAprovado()){
                         novosPeladeiros.add(solicitacao);
                     }
@@ -244,36 +249,40 @@ public class Chama1MapaFragment extends Fragment implements
         Toast.makeText(getContext(),  "Solicitação Aprovada", Toast.LENGTH_SHORT).show();
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
 
+        String username_currentUser = currentUser.getUsername();
+
         // usuario foi aprovado, reduz quantidade de usuarios faltando
         usuariosFaltando = usuariosFaltando - 1;
         String solicitante = marker.getTitle();
-        String solicitacao = solicitante+"-"+currentUser;
+        String solicitacao = solicitante+"-"+username_currentUser;
 
         // atualiza objetos de solicitacao e busca
         Map<String, Object> solicitacaoAprovada = new HashMap<String, Object>();
         solicitacaoAprovada.put("solicitacoes/"+solicitacao+"/aprovado", true);
-        solicitacaoAprovada.put("buscas/"+currentUser+"/usuariosFaltando", usuariosFaltando );
-        //solicitacaoAprovada.put("contatos/"+currentUser+"/contato", solicitante);
-        //solicitacaoAprovada.put("contatos/"+solicitante+"/contato", currentUser);
+        solicitacaoAprovada.put("buscas/"+username_currentUser+"/usuariosFaltando", usuariosFaltando );
         myFirebaseRef.updateChildren(solicitacaoAprovada);
         marker.remove();
 
         // adiciona o dono da pelada aos contatos do peladeiro
-        Firebase myref = myFirebaseRef.child("contatos").child(solicitante);
+        Firebase myref = myFirebaseRef.child("contatos");
         Map<String, Object> cadastroContatos = new HashMap<String, Object>();
-        cadastroContatos.put("contato", currentUser);
+        cadastroContatos.put("username", solicitante);
+        cadastroContatos.put("contato", username_currentUser);
         myref.push().setValue(cadastroContatos);
 
         // adiciona o peladeiro aos contatos do dono da pelada
-        myref = myFirebaseRef.child("contatos").child(currentUser);
+        myref = myFirebaseRef.child("contatos");
         cadastroContatos = new HashMap<String, Object>();
+        cadastroContatos.put("username",username_currentUser);
         cadastroContatos.put("contato", solicitante);
         myref.push().setValue(cadastroContatos);
 
-        // caso não falte mais usuarios, exclui a busca do bd
+        // caso não falte mais usuarios, exclui a busca do bd e redirecina pra contatos
         if(usuariosFaltando == 0){
-            myref = myFirebaseRef.child("buscas").child(currentUser);
+            myref = myFirebaseRef.child("buscas").child(username_currentUser);
             myref.removeValue();
+            ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
+            view.setCurrentItem(4, true);
         }
 
     }

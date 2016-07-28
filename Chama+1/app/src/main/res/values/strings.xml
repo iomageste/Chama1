@@ -3,6 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="current_user">eduardo</string>
 
     <string-array name="chamaMais_array">
         <item>1</item>

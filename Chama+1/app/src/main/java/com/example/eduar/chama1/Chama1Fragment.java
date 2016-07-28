@@ -5,6 +5,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -22,14 +24,6 @@ import android.widget.Toast;
 
 import com.example.eduar.model.Busca;
 import com.firebase.client.Firebase;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 
 /**
@@ -44,6 +38,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     SeekBar seekComecaEm;
     int chamaMais = 0;
     String tipo = "";
+    String currentUser;
 
     public Chama1Fragment() {
         // Required empty public constructor
@@ -56,6 +51,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chama1, container, false);
+        currentUser = getResources().getString(R.string.current_user);
 
         buttonBuscar = (Button) view.findViewById(R.id.buttonBuscar);
         spinnerChamaMais = (Spinner) view.findViewById(R.id.spinnerChamaMais);
@@ -92,20 +88,30 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                 String dados = "Chama+"+chamaMais+", Tipo:"+tipo;
                 dados += ", Area:"+seekArea.getProgress();
                 dados += ", ComecaEm:"+seekComecaEm.getProgress();
-                Busca busca = new Busca("eduardo", chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
+                Busca busca = new Busca(currentUser, chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
                 //Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
                 Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
                 Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                myFirebaseRef.child("buscas").child("eduardo").setValue(busca);
+                myFirebaseRef.child("buscas").child(currentUser).setValue(busca);
 
-                /*getFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.viewPager, new Chama1MapaFragment())
-                        .commit();*/
-                ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
-                view.setCurrentItem(4, true);
-                //ViewPagerAdapter viewAdapter = (ViewPagerAdapter) view.getAdapter();
-                //viewAdapter.set
+                Bundle args = new Bundle();
+                int areaBusca = seekArea.getProgress()*1000; // quilometros
+                args.putString("AreaBusca", String.valueOf(areaBusca));
+                args.putString("Chama+", String.valueOf(chamaMais));
+                Fragment fragment = new Chama1MapaFragment();
+                fragment.setArguments(args);
+
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                fragmentTransaction.replace(R.id.chama1, fragment, "chama1mapafragment").addToBackStack("");
+                fragmentTransaction.commit();
+
+
+
+                /*ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
+                view.setCurrentItem(4, true);*/
+
             }
         });
     }

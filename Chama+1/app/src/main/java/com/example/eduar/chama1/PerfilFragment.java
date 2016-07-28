@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,14 +17,22 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PerfilFragment extends Fragment {
 
-    EditText userName;
-    EditText telefone;
+    EditText editUserName;
+    EditText editTelefone;
+    String username;
+    String telefone;
+    Button buttonSalvar;
+    View view;
+    String currentUser;
 
     public PerfilFragment() {
         // Required empty public constructor
@@ -34,21 +43,26 @@ public class PerfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_perfil, container, false);
+        view = inflater.inflate(R.layout.fragment_perfil, container, false);
+        currentUser = getResources().getString(R.string.current_user);
 
-        userName = (EditText) view.findViewById(R.id.textNome);
-        telefone = (EditText) view.findViewById(R.id.textTelefone);
+        editUserName = (EditText) view.findViewById(R.id.textNome);
+        editTelefone = (EditText) view.findViewById(R.id.textTelefone);
+        buttonSalvar = (Button) view.findViewById(R.id.buttonSalvar);
+        addListenerOnButton(view);
 
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-        Query queryRef = myFirebaseRef.orderByChild("nome").equalTo("eduardo");
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
+        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser);
 
         queryRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChild) {
                 User user = snapshot.getValue(User.class);
                 if(user != null) {
-                    userName.setText(user.getUsername());
-                    telefone.setText(user.getTelefone());
+                    editUserName.setText(user.getNome());
+                    editTelefone.setText(user.getTelefone());
+                    username = user.getUsername();
+                    telefone = user.getTelefone();
                 }
             }
 
@@ -62,6 +76,24 @@ public class PerfilFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    public void addListenerOnButton(View view) {
+        buttonSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                String new_name = editUserName.getText().toString();
+                String new_tel = editTelefone.getText().toString();
+
+                Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+                Firebase myref = myFirebaseRef.child("users").child(username);
+                Map<String, Object> updatedUser = new HashMap<String, Object>();
+                updatedUser.put("nome", new_name);
+                updatedUser.put("telefone", new_tel);
+                myref.updateChildren(updatedUser);
+
+            }
+        });
     }
 
 }

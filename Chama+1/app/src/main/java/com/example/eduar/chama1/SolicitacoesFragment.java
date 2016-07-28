@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.eduar.model.Busca;
 import com.example.eduar.model.Solicitacao;
@@ -25,6 +26,7 @@ public class SolicitacoesFragment extends Fragment {
 
     ListView listSolicitacoes;
     SolicitacoesAdapter adapter;
+    String currentUser;
 
     public SolicitacoesFragment() {
         // Required empty public constructor
@@ -36,6 +38,7 @@ public class SolicitacoesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_solicitacoes, container, false);
+        currentUser = getResources().getString(R.string.current_user);
 
         listSolicitacoes =  (ListView) view.findViewById(R.id.listSolicitacoes);
 
@@ -50,7 +53,8 @@ public class SolicitacoesFragment extends Fragment {
                     adapter.clear();
                     for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                         Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
-                        if (solicitacao != null) {
+
+                        if (solicitacao != null && solicitacao.getSolicitante_username().equals(currentUser)) {
                             adapter.add(solicitacao);
                         }
                     }

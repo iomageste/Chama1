@@ -16,6 +16,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eduar.model.Busca;
+import com.example.eduar.model.Solicitacao;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +35,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +49,12 @@ public class Chama1MapaFragment extends Fragment implements
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
+    private List<Solicitacao> novosPeladeiros;
+    private Map<String, Marker> marcadoresPeladeiros;
+    LatLng currentLoc;
+    int areaBusca;
+    String currentUser;
+    int usuariosFaltando;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         //private final View mWindow;
@@ -99,6 +118,31 @@ public class Chama1MapaFragment extends Fragment implements
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_peladas, container, false);
 
+        areaBusca = Integer.parseInt(getArguments().getString("AreaBusca"));
+        usuariosFaltando = Integer.parseInt(getArguments().getString("Chama+"));
+        currentUser = getResources().getString(R.string.current_user);
+
+        novosPeladeiros = new ArrayList<>();
+        marcadoresPeladeiros = new HashMap<String, Marker>();
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+
+        myFirebaseRef.child("solicitacoes").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                novosPeladeiros.clear();
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
+                    if(solicitacao != null
+                            && !solicitacao.getSolicitante_username().equals(currentUser)
+                            && !solicitacao.isAprovado()){
+                        novosPeladeiros.add(solicitacao);
+                    }
+                }
+
+            }
+            @Override public void onCancelled(FirebaseError error) { }
+        });
+
         gMapView = (MapView) view.findViewById(R.id.map);
         gMapView.onCreate(savedInstanceState);
         gMapView.getMapAsync(this);
@@ -158,26 +202,32 @@ public class Chama1MapaFragment extends Fragment implements
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
-            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
 
-            // Exemplo de calculo de distancia entre dois pontos, resultado em results[0]
-            float[] results = new float[1];
-            Location.distanceBetween(location.getLatitude(), location.getLongitude(), -21.751809, -43.353663, results);
-            TextView locationTv = (TextView) getView().findViewById(R.id.lat_long);
-            locationTv.setText("Latitude:" + loc.latitude + ", Longitude:" + loc.longitude+", Distance:"+results[0]);
+            for (Solicitacao solicitacao : novosPeladeiros) {
+                for (String username : marcadoresPeladeiros.keySet()) {
+                    if (solicitacao.getSolicitante_username().equals(username)) {
+                        marcadoresPeladeiros.get(username).remove();
+                        break;
+                    }
+                }
 
-            int height = 100;
-            int width = 100;
-            BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
-            Bitmap b=bitmapdraw.getBitmap();
-            Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                float[] results = new float[1];
+                Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                        solicitacao.getLatitude(), solicitacao.getLongitude(), results);
+                double distancia = results[0];
+                //Toast.makeText(getContext(), "AreaBusca:"+areaBusca+", Distancia:"+distancia, Toast.LENGTH_SHORT).show();
+                if(distancia < Double.valueOf(areaBusca)){
+                    int height = 100;
+                    int width = 100;
+                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
+                    Bitmap b=bitmapdraw.getBitmap();
+                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-            LatLng myLocal = new LatLng( -21.751809, -43.353663);
-            myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("Luiz Vinicius").snippet("Faltando: 3, Tipo: Quadra, Começa em: 30m").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-
-            //Marker mMarker = gMap.addMarker(new MarkerOptions().position(loc));
-            if(gMap != null){
-                gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+                    LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
+                    myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    marcadoresPeladeiros.put(solicitacao.getSolicitante_username(), myMarker);
+                }
             }
         }
     };
@@ -191,10 +241,41 @@ public class Chama1MapaFragment extends Fragment implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getContext(),  "Solicitação Enviada", Toast.LENGTH_SHORT).show();
-        // insere no banco
-        // solicitante_id (usuario logado), candidato_id (usuario associado ao marker),
-        // aprovado (false, até o outro solicitante dar o ok)
+        Toast.makeText(getContext(),  "Solicitação Aprovada", Toast.LENGTH_SHORT).show();
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+
+        // usuario foi aprovado, reduz quantidade de usuarios faltando
+        usuariosFaltando = usuariosFaltando - 1;
+        String solicitante = marker.getTitle();
+        String solicitacao = solicitante+"-"+currentUser;
+
+        // atualiza objetos de solicitacao e busca
+        Map<String, Object> solicitacaoAprovada = new HashMap<String, Object>();
+        solicitacaoAprovada.put("solicitacoes/"+solicitacao+"/aprovado", true);
+        solicitacaoAprovada.put("buscas/"+currentUser+"/usuariosFaltando", usuariosFaltando );
+        //solicitacaoAprovada.put("contatos/"+currentUser+"/contato", solicitante);
+        //solicitacaoAprovada.put("contatos/"+solicitante+"/contato", currentUser);
+        myFirebaseRef.updateChildren(solicitacaoAprovada);
+        marker.remove();
+
+        // adiciona o dono da pelada aos contatos do peladeiro
+        Firebase myref = myFirebaseRef.child("contatos").child(solicitante);
+        Map<String, Object> cadastroContatos = new HashMap<String, Object>();
+        cadastroContatos.put("contato", currentUser);
+        myref.push().setValue(cadastroContatos);
+
+        // adiciona o peladeiro aos contatos do dono da pelada
+        myref = myFirebaseRef.child("contatos").child(currentUser);
+        cadastroContatos = new HashMap<String, Object>();
+        cadastroContatos.put("contato", solicitante);
+        myref.push().setValue(cadastroContatos);
+
+        // caso não falte mais usuarios, exclui a busca do bd
+        if(usuariosFaltando == 0){
+            myref = myFirebaseRef.child("buscas").child(currentUser);
+            myref.removeValue();
+        }
+
     }
 
 }

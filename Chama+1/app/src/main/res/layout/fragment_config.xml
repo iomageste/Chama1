@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="2                     10                    100"
+        android:text="2                     50                    100"
         android:id="@+id/labelAreaValores"
         android:layout_marginTop="260dp"
         android:layout_gravity="center_horizontal"

@@ -30,7 +30,7 @@ public class ConfigFragment extends Fragment {
     Button buttonSalvar;
     CheckBox checkBoxNotificacao;
     SeekBar seekArea;
-    String currentUser;
+    User currentUser;
 
     public ConfigFragment() {
         // Required empty public constructor
@@ -42,14 +42,15 @@ public class ConfigFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_config, container, false);
-        currentUser = getResources().getString(R.string.current_user);
+        //currentUser = getResources().getString(R.string.current_user);
+        currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
 
         buttonSalvar = (Button) view.findViewById(R.id.buttonSalvar);
         checkBoxNotificacao = (CheckBox) view.findViewById(R.id.checkBoxNotificacao);
         seekArea = (SeekBar) view.findViewById(R.id.seekArea);
 
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser);
+        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser.getUsername());
 
         queryRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -80,7 +81,7 @@ public class ConfigFragment extends Fragment {
                 dados += ", Area:"+seekArea.getProgress();
 
                 Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                Firebase myref = myFirebaseRef.child("users").child(currentUser);
+                Firebase myref = myFirebaseRef.child("users").child(currentUser.getUsername());
                 Map<String, Object> updatedUser = new HashMap<String, Object>();
                 updatedUser.put("notificacoes", checkBoxNotificacao.isChecked());
                 updatedUser.put("areaBusca", seekArea.getProgress());

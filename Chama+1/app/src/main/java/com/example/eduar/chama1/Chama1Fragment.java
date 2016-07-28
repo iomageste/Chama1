@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eduar.model.Busca;
+import com.example.eduar.model.User;
 import com.firebase.client.Firebase;
 
 
@@ -38,7 +39,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     SeekBar seekComecaEm;
     int chamaMais = 0;
     String tipo = "";
-    String currentUser;
+    User currentUser;
 
     public Chama1Fragment() {
         // Required empty public constructor
@@ -51,7 +52,8 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chama1, container, false);
-        currentUser = getResources().getString(R.string.current_user);
+        //currentUser = getResources().getString(R.string.current_user);
+        currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
 
         buttonBuscar = (Button) view.findViewById(R.id.buttonBuscar);
         spinnerChamaMais = (Spinner) view.findViewById(R.id.spinnerChamaMais);
@@ -88,11 +90,11 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                 String dados = "Chama+"+chamaMais+", Tipo:"+tipo;
                 dados += ", Area:"+seekArea.getProgress();
                 dados += ", ComecaEm:"+seekComecaEm.getProgress();
-                Busca busca = new Busca(currentUser, chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
+                Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
                 //Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
                 Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
                 Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                myFirebaseRef.child("buscas").child(currentUser).setValue(busca);
+                myFirebaseRef.child("buscas").child(currentUser.getUsername()).setValue(busca);
 
                 Bundle args = new Bundle();
                 int areaBusca = seekArea.getProgress()*1000; // quilometros

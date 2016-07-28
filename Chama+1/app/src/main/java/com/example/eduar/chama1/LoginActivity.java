@@ -3,7 +3,11 @@ package com.example.eduar.chama1;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -34,6 +38,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world", "igor.mageste@gmail.com:1q2w3e4r"
     };
+    private static List<User> credentials;
+    private User currentUser;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -67,6 +74,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        credentials = new ArrayList<User>();
+        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+        myFirebaseRef.child("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                credentials.clear();
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    User user = postSnapshot.getValue(User.class);
+                    credentials.add(user);
+                }
+            }
+            @Override public void onCancelled(FirebaseError error) {
+                System.out.println("The read failed: " + error.getMessage());
+            }
+        });
+
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -154,7 +178,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return true;
+        //return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
@@ -301,14 +326,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             });
 
 
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+            for(User user : credentials){
+                if(user.getUsername().equals(mEmail) &&
+                        user.getPassword().equals(mPassword)) {
+                    currentUser = user;
+                    return true;
                 }
             }
+
 
             // TODO: register the new account here.
             return false;
@@ -321,6 +346,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 finish();
+                Application app = (CustomApplication) getApplication();
+                ((CustomApplication) getApplication()).setCurrentUser(currentUser);
+
                 Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
                 LoginActivity.this.startActivity(myIntent);
             } else {

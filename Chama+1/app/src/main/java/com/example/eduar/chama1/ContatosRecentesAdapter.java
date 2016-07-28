@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.eduar.model.Contato;
 import com.example.eduar.model.User;
@@ -14,6 +15,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -48,22 +50,21 @@ public class ContatosRecentesAdapter extends ArrayAdapter<Contato>{
         userTelefone.setText("Carregando...");
 
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(contato.getContato());
+        Query queryRef = myFirebaseRef.child(contato.getContato());
 
-        queryRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            public void onDataChange(DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
+
                 if(user != null){
                     userName.setText(user.getNome());
                     userTelefone.setText(user.getTelefone());
                 }
             }
-
-            @Override public void onChildRemoved(DataSnapshot dataSnapshot) { }
-            @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onCancelled(FirebaseError firebaseError) { }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
         });
 
 

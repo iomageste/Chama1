@@ -58,7 +58,7 @@ public class PeladasFragment extends Fragment implements
     private List<Busca> novasPeladas;
     private Map<String, Marker> marcadoresPeladas;
     LatLng currentLoc;
-    String currentUser;
+    User currentUser;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         //private final View mWindow;
@@ -121,7 +121,8 @@ public class PeladasFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_peladas, container, false);
-        currentUser = getResources().getString(R.string.current_user);
+        //currentUser = getResources().getString(R.string.current_user);
+        currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
 
         novasPeladas = new ArrayList<>();
         marcadoresPeladas = new HashMap<String, Marker>();
@@ -134,7 +135,7 @@ public class PeladasFragment extends Fragment implements
                 novasPeladas.clear();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                     Busca pelada = postSnapshot.getValue(Busca.class);
-                    if(pelada != null && !pelada.getUsername().equals(currentUser)){
+                    if(pelada != null && !pelada.getUsername().equals(currentUser.getUsername())){
                         novasPeladas.add(pelada);
                     }
                 }
@@ -244,8 +245,8 @@ public class PeladasFragment extends Fragment implements
         Toast.makeText(getContext(),  "Solicitação Enviada", Toast.LENGTH_SHORT).show();
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
 
-        Solicitacao solicitacao = new Solicitacao(currentUser, marker.getTitle(), currentLoc.latitude, currentLoc.longitude);
-        myFirebaseRef.child("solicitacoes").child(currentUser+"-"+marker.getTitle()).setValue(solicitacao);
+        Solicitacao solicitacao = new Solicitacao(currentUser.getUsername(), marker.getTitle(), currentLoc.latitude, currentLoc.longitude);
+        myFirebaseRef.child("solicitacoes").child(currentUser.getUsername()+"-"+marker.getTitle()).setValue(solicitacao);
 
         ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
         view.setCurrentItem(3, true);

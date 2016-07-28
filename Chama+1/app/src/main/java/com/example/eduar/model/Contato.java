@@ -5,12 +5,14 @@ package com.example.eduar.model;
  */
 public class Contato {
 
+    private String username;
     private String contato;
 
     public Contato() {
     }
 
-    public Contato(String contato) {
+    public Contato(String username, String contato) {
+        this.username = username;
         this.contato = contato;
     }
 
@@ -20,5 +22,11 @@ public class Contato {
 
     public void setContato(String contato) {
         this.contato = contato;
+    }
+
+    public String getUsername() {  return username; }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

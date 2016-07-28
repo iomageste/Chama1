@@ -1,11 +1,14 @@
 package com.example.eduar.chama1;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.storage.StorageManager;
 import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,7 +45,6 @@ public class MainActivity extends FragmentActivity {
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1);
-
 
 
         viewPager.setAdapter(viewPagerAdapter);

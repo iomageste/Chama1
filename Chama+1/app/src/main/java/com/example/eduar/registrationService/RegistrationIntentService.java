@@ -27,7 +27,7 @@ public class RegistrationIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        try {
+      /*  try {
             // Inicialmente, esta chamada usa a rede para recuperar o token, chamadas subsequentes são locais.
             // R.string.gcm_defaultSenderId é derivado de google-service.json.
             // Veja https://developers.google.com/cloud-messaging/android/start para detalhes deste arquivo.
@@ -37,7 +37,7 @@ public class RegistrationIntentService extends IntentService {
 
         } catch (Exception e) {
             sendRegistrationEvent(false, null, null, null, getString(R.string.activity_authenticator_falha_inesperada));
-        }
+        }*/
     }
 
     private void sendRegistrationEvent(final boolean register, final String token, final String email, final String password, final String messageError) {

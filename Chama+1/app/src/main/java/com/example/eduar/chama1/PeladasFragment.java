@@ -163,8 +163,7 @@ public class PeladasFragment extends Fragment implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, -87.9), 10);
-        gMap.animateCamera(cameraUpdate);
+        gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         gMap.getUiSettings().setMyLocationButtonEnabled(true);
         gMap.setMyLocationEnabled(true);
         gMap.setOnMyLocationChangeListener(myLocationChangeListener);

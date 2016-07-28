@@ -5,7 +5,7 @@ package com.example.eduar.model;
 /**
  * Created by eduar on 7/19/2016.
  */
-public class User{
+public class User {
 
     private String username;
     private String nome;

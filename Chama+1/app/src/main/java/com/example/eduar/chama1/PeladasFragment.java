@@ -2,6 +2,7 @@ package com.example.eduar.chama1;
 
 
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -205,6 +206,7 @@ public class PeladasFragment extends Fragment implements
         @Override
         public void onMyLocationChange(Location location) {
             currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+            ((CustomApplication) getActivity().getApplication()).setCurrentLocation(currentLoc);
 
              for(Busca pelada: novasPeladas){
                  for (String username :marcadoresPeladas.keySet()) {

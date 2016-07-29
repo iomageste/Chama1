@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.example.eduar.model.User;
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by eduar on 7/27/2016.
@@ -11,6 +12,7 @@ import com.firebase.client.Firebase;
 public class CustomApplication extends Application {
 
     User currentUser;
+    LatLng currentLocation;
 
     @Override
     public void onCreate() {
@@ -24,5 +26,13 @@ public class CustomApplication extends Application {
 
     public User getCurrentUser(){
         return this.currentUser;
+    }
+
+    public LatLng getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(LatLng currentLocation) {
+        this.currentLocation = currentLocation;
     }
 }

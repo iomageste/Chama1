@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.eduar.model.Busca;
 import com.example.eduar.model.User;
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.model.LatLng;
 
 
 /**
@@ -40,6 +41,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     int chamaMais = 0;
     String tipo = "";
     User currentUser;
+    LatLng currentLoc;
 
     public Chama1Fragment() {
         // Required empty public constructor
@@ -87,11 +89,10 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         buttonBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                String dados = "Chama+"+chamaMais+", Tipo:"+tipo;
-                dados += ", Area:"+seekArea.getProgress();
-                dados += ", ComecaEm:"+seekComecaEm.getProgress();
-                Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), -21.751809, -43.353663);
-                //Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
+
+                currentLoc = ((CustomApplication) getActivity().getApplication()).getCurrentLocation();
+                Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), currentLoc.latitude, currentLoc.longitude);
+
                 Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
                 Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
                 myFirebaseRef.child("buscas").child(currentUser.getUsername()).setValue(busca);

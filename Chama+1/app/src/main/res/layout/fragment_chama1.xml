@@ -3,7 +3,7 @@
     android:id="@+id/chama1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.eduar.chama1.Chama1Fragment">
+    tools:context="com.example.ufjf.chama1.Chama1Fragment">
 
     <TextView
         android:layout_width="wrap_content"

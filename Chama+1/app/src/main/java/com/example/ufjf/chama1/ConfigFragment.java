@@ -87,6 +87,8 @@ public class ConfigFragment extends Fragment {
                 myref.updateChildren(updatedUser);
 
                 Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
+                currentUser.setAreaBusca(seekArea.getProgress());
+                currentUser.setNotificacoes(checkBoxNotificacao.isChecked());
             }
         });
 

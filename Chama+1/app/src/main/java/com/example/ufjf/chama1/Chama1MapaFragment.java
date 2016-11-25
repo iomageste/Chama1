@@ -151,6 +151,8 @@ public class Chama1MapaFragment extends Fragment implements
             e.printStackTrace();
         }
 
+        // dispara notificações para usuários
+
         return view;
 
     }
@@ -209,11 +211,13 @@ public class Chama1MapaFragment extends Fragment implements
                 }
 
                 float[] results = new float[1];
-                Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
                         solicitacao.getLatitude(), solicitacao.getLongitude(), results);
                 double distancia = results[0];
-                //Toast.makeText(getContext(), "AreaBusca:"+areaBusca+", Distancia:"+distancia, Toast.LENGTH_SHORT).show();
-                if(distancia < Double.valueOf(areaBusca)){
+
+                // Somente exibe solicitação se ela estiver dentro da área de busca definida para
+                // esta pelada
+                if(distancia < Double.valueOf(areaBusca) || areaBusca == 0){
                     int height = 100;
                     int width = 100;
                     BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);

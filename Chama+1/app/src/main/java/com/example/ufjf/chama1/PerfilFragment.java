@@ -1,6 +1,8 @@
 package com.example.ufjf.chama1;
 
 
+import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ public class PerfilFragment extends Fragment {
     String username;
     String telefone;
     Button buttonSalvar;
+    Button buttonLogout;
     View view;
     User currentUser;
 
@@ -49,6 +52,7 @@ public class PerfilFragment extends Fragment {
         editUserName = (EditText) view.findViewById(R.id.textNome);
         editTelefone = (EditText) view.findViewById(R.id.textTelefone);
         buttonSalvar = (Button) view.findViewById(R.id.buttonSalvar);
+        buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
         addListenerOnButton(view);
 
         Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
@@ -72,9 +76,6 @@ public class PerfilFragment extends Fragment {
             @Override public void onCancelled(FirebaseError firebaseError) { }
         });
 
-
-
-        // Inflate the layout for this fragment
         return view;
     }
 
@@ -91,6 +92,16 @@ public class PerfilFragment extends Fragment {
                 updatedUser.put("nome", new_name);
                 updatedUser.put("telefone", new_tel);
                 myref.updateChildren(updatedUser);
+
+            }
+        });
+
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                ((CustomApplication)getActivity().getApplication()).setCurrentUser(null);
+                Intent myIntent = new Intent(getActivity(),LoginActivity.class);
+                getActivity().startActivity(myIntent);
 
             }
         });

@@ -17,6 +17,11 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.google.android.gms.auth.api.Auth;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +41,8 @@ public class PerfilFragment extends Fragment {
     View view;
     User currentUser;
 
+    private DatabaseReference mFirebaseDatabaseReference;
+
     public PerfilFragment() {
         // Required empty public constructor
     }
@@ -48,6 +55,7 @@ public class PerfilFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_perfil, container, false);
 
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         editUserName = (EditText) view.findViewById(R.id.textNome);
         editTelefone = (EditText) view.findViewById(R.id.textTelefone);
@@ -55,26 +63,8 @@ public class PerfilFragment extends Fragment {
         buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
         addListenerOnButton(view);
 
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser.getUsername());
-
-        queryRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
-                User user = snapshot.getValue(User.class);
-                if(user != null) {
-                    editUserName.setText(user.getNome());
-                    editTelefone.setText(user.getTelefone());
-                    username = user.getUsername();
-                    telefone = user.getTelefone();
-                }
-            }
-
-            @Override public void onChildRemoved(DataSnapshot dataSnapshot) { }
-            @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onCancelled(FirebaseError firebaseError) { }
-        });
+        editUserName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        editTelefone.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
         return view;
     }
@@ -86,12 +76,10 @@ public class PerfilFragment extends Fragment {
                 String new_name = editUserName.getText().toString();
                 String new_tel = editTelefone.getText().toString();
 
-                Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                Firebase myref = myFirebaseRef.child("users").child(username);
                 Map<String, Object> updatedUser = new HashMap<String, Object>();
                 updatedUser.put("nome", new_name);
                 updatedUser.put("telefone", new_tel);
-                myref.updateChildren(updatedUser);
+                mFirebaseDatabaseReference.child("users").child(username).updateChildren(updatedUser);
 
             }
         });
@@ -99,10 +87,11 @@ public class PerfilFragment extends Fragment {
         buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                Auth.GoogleSignInApi.signOut(((CustomApplication)getActivity().getApplication()).getmGoogleApiClient());
+                FirebaseAuth.getInstance().signOut();
                 ((CustomApplication)getActivity().getApplication()).setCurrentUser(null);
-                Intent myIntent = new Intent(getActivity(),LoginActivity.class);
+                Intent myIntent = new Intent(getActivity(),SignInActivity.class);
                 getActivity().startActivity(myIntent);
-
             }
         });
     }

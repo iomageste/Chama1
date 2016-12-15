@@ -33,6 +33,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +56,8 @@ public class PeladasFragment extends Fragment implements
     private Map<String, Marker> marcadoresPeladas;
     LatLng currentLoc;
     User currentUser;
-    View myview;
+
+    private DatabaseReference mFirebaseDatabaseReference;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         private final View mContents;
@@ -101,7 +105,6 @@ public class PeladasFragment extends Fragment implements
 
     }
 
-
     private MapView gMapView;
     private GoogleMap gMap = null;
     Marker myMarker;
@@ -109,8 +112,6 @@ public class PeladasFragment extends Fragment implements
     public PeladasFragment() {
         // Required empty public constructor
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -121,40 +122,36 @@ public class PeladasFragment extends Fragment implements
         novasPeladas = new ArrayList<>();
         userSolicitacoes = new ArrayList<>();
         marcadoresPeladas = new HashMap<String, Marker>();
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Mantém registro de peladas ativas atualizado de maneira assíncrona
-        myFirebaseRef.child("buscas").addValueEventListener(new ValueEventListener() {
+        mFirebaseDatabaseReference.child("buscas").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 novasPeladas.clear();
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot: snapshot.getChildren()) {
                     Busca pelada = postSnapshot.getValue(Busca.class);
                     if(pelada != null && !pelada.getUsername().equals(currentUser.getUsername())){
                         novasPeladas.add(pelada);
                     }
                 }
-
-
             }
-            @Override public void onCancelled(FirebaseError error) { }
+            @Override public void onCancelled(DatabaseError databaseError) { }
         });
 
         // Mantém registro de solicitações do usuário atualizado de maneira assíncrona
-        myFirebaseRef.child("solicitacoes").addValueEventListener(new ValueEventListener() {
+        mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 userSolicitacoes.clear();
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot: snapshot.getChildren()) {
                     Solicitacao sol = postSnapshot.getValue(Solicitacao.class);
                     if(sol != null && sol.getSolicitante_username().equals(currentUser.getUsername())){
                         userSolicitacoes.add(sol);
                     }
                 }
-
-
             }
-            @Override public void onCancelled(FirebaseError error) { }
+            @Override public void onCancelled(DatabaseError error) { }
         });
 
         gMapView = (MapView) view.findViewById(R.id.map);
@@ -277,10 +274,9 @@ public class PeladasFragment extends Fragment implements
     @Override
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(getContext(),  "Solicitação Enviada", Toast.LENGTH_SHORT).show();
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
 
         Solicitacao solicitacao = new Solicitacao(currentUser.getUsername(), marker.getTitle(), currentLoc.latitude, currentLoc.longitude);
-        myFirebaseRef.child("solicitacoes").child(currentUser.getUsername()+"-"+marker.getTitle()).setValue(solicitacao);
+        mFirebaseDatabaseReference.child("solicitacoes").child(currentUser.getUsername()+"-"+marker.getTitle()).setValue(solicitacao);
 
         ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
         view.setCurrentItem(3, true);

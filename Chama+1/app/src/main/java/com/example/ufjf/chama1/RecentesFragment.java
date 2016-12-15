@@ -14,6 +14,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -26,10 +29,11 @@ public class RecentesFragment extends Fragment {
     ListView listRecentes;
     User currentUser;
 
+    private DatabaseReference mFirebaseDatabaseReference;
+
     public RecentesFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,29 +44,26 @@ public class RecentesFragment extends Fragment {
         listRecentes = (ListView) view.findViewById(R.id.listRecentes);
         //currentUser = getResources().getString(R.string.current_user);
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
-
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         ArrayList<Contato> contatos = new ArrayList<Contato>();
         final ContatosRecentesAdapter contatosAdapter = new ContatosRecentesAdapter(getContext(), contatos);
 
         listRecentes.setAdapter(contatosAdapter);
 
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-        myFirebaseRef.child("contatos").addValueEventListener(new ValueEventListener() {
+        mFirebaseDatabaseReference.child("contatos").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                 contatosAdapter.clear();
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Contato contato = postSnapshot.getValue(Contato.class);
 
                     if (contato != null && contato.getUsername().equals(currentUser.getUsername())) {
                         contatosAdapter.add(contato);
                     }
                 }
-
             }
-
-            @Override public void onCancelled(FirebaseError error) { }
+            @Override public void onCancelled(DatabaseError databaseError) {}
         });
 
 

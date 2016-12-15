@@ -31,6 +31,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +55,8 @@ public class Chama1MapaFragment extends Fragment implements
     int areaBusca;
     User currentUser;
     int usuariosFaltando;
+
+    private DatabaseReference mFirebaseDatabaseReference;
 
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         //private final View mWindow;
@@ -122,23 +127,23 @@ public class Chama1MapaFragment extends Fragment implements
 
         novosPeladeiros = new ArrayList<>();
         marcadoresPeladeiros = new HashMap<String, Marker>();
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        myFirebaseRef.child("solicitacoes").addValueEventListener(new ValueEventListener() {
+        mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                 novosPeladeiros.clear();
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
                     if(solicitacao != null
-                            && !solicitacao.getSolicitante_username().equals(currentUser.getUsername())
+                            && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
                             && !solicitacao.isAprovado()){
                         novosPeladeiros.add(solicitacao);
                     }
                 }
 
             }
-            @Override public void onCancelled(FirebaseError error) { }
+            @Override public void onCancelled(DatabaseError error) { }
         });
 
         gMapView = (MapView) view.findViewById(R.id.map);
@@ -242,7 +247,6 @@ public class Chama1MapaFragment extends Fragment implements
     @Override
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(getContext(),  "Solicitação Aprovada", Toast.LENGTH_SHORT).show();
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
 
         String username_currentUser = currentUser.getUsername();
 
@@ -255,27 +259,24 @@ public class Chama1MapaFragment extends Fragment implements
         Map<String, Object> solicitacaoAprovada = new HashMap<String, Object>();
         solicitacaoAprovada.put("solicitacoes/"+solicitacao+"/aprovado", true);
         solicitacaoAprovada.put("buscas/"+username_currentUser+"/usuariosFaltando", usuariosFaltando );
-        myFirebaseRef.updateChildren(solicitacaoAprovada);
+        mFirebaseDatabaseReference.updateChildren(solicitacaoAprovada);
         marker.remove();
 
         // adiciona o dono da pelada aos contatos do peladeiro
-        Firebase myref = myFirebaseRef.child("contatos");
         Map<String, Object> cadastroContatos = new HashMap<String, Object>();
         cadastroContatos.put("username", solicitante);
         cadastroContatos.put("contato", username_currentUser);
-        myref.push().setValue(cadastroContatos);
+        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
 
         // adiciona o peladeiro aos contatos do dono da pelada
-        myref = myFirebaseRef.child("contatos");
         cadastroContatos = new HashMap<String, Object>();
         cadastroContatos.put("username",username_currentUser);
         cadastroContatos.put("contato", solicitante);
-        myref.push().setValue(cadastroContatos);
+        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
 
         // caso não falte mais usuarios, exclui a busca do bd e redirecina pra contatos
         if(usuariosFaltando == 0){
-            myref = myFirebaseRef.child("buscas").child(username_currentUser);
-            myref.removeValue();
+            mFirebaseDatabaseReference.child("buscas").child(username_currentUser).removeValue();
             ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
             view.setCurrentItem(4, true);
         }

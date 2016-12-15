@@ -7,29 +7,45 @@ package com.example.ufjf.model;
  */
 public class User {
 
+    private String uid;
     private String username;
-    private String nome;
-    private String password;
+    private String email;
     private String telefone;
     private boolean notificacoes;
     private int areaBusca;
 
     public User() {
-
+        this.areaBusca = 10;
+        this.telefone = "(00) 0000-0000";
     }
 
-    public User(String nome, String telefone) {
-        this.nome = nome;
-        this.telefone = telefone;
-    }
-
-    public User(String username, String nome, String password, String telefone, int areaBusca) {
+    public User(String uid, String username, String email) {
+        this.uid = uid;
         this.username = username;
-        this.nome = nome;
-        this.password = password;
+        this.email = email;
+        this.areaBusca = 10;
+        this.telefone = "(00) 0000-0000";
+    }
+
+    public User(String username, String telefone) {
+        this.username = username;
         this.telefone = telefone;
+        this.areaBusca = 10;
+        this.telefone = "(00) 0000-0000";
+    }
+
+    public User(String uid, String username, String email, String telefone, boolean notificacoes, int areaBusca) {
+        this.uid = uid;
+        this.username = username;
+        this.email = email;
+        this.telefone = telefone;
+        this.notificacoes = notificacoes;
         this.areaBusca = areaBusca;
     }
+
+    public String getUid() { return uid; }
+
+    public void setUid(String uid) { this.uid = uid; }
 
     public String getUsername() {
         return username;
@@ -39,21 +55,9 @@ public class User {
         this.username = username;
     }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getEmail() {return email;}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public void setEmail(String email) { this.email = email; }
 
     public String getTelefone() {
         return telefone;

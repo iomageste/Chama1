@@ -8,12 +8,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:784054919943:android:594c77e44459e4eb",
+        "mobilesdk_app_id": "1:784054919943:android:144e0e72b32beab2",
         "android_client_info": {
-          "package_name": "com.example.eduar.chama1"
+          "package_name": "com.example.ufjf"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "784054919943-gif3fk00p2sgbv2v5l7bevk7ekkjr0i9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ufjf",
+            "certificate_hash": "A08CD33DE519B97962CBF37D4FCA48BF24B3F145"
+          }
+        },
+        {
+          "client_id": "784054919943-m59827hlovaq1305dhmvjm0ran6hk1a1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ufjf",
+            "certificate_hash": "CD7479F2BAC90C0BAFCFCF222C743737C362FE33"
+          }
+        },
         {
           "client_id": "784054919943-tk15cgtechas3sp28ve5thd9amgj5fuk.apps.googleusercontent.com",
           "client_type": 3
@@ -29,8 +45,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "784054919943-tk15cgtechas3sp28ve5thd9amgj5fuk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

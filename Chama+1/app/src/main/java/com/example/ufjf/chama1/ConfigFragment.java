@@ -17,6 +17,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +34,8 @@ public class ConfigFragment extends Fragment {
     CheckBox checkBoxNotificacao;
     SeekBar seekArea;
     User currentUser;
+
+    private DatabaseReference mFirebaseDatabaseReference;
 
     public ConfigFragment() {
         // Required empty public constructor
@@ -47,23 +52,23 @@ public class ConfigFragment extends Fragment {
         buttonSalvar = (Button) view.findViewById(R.id.buttonSalvar);
         checkBoxNotificacao = (CheckBox) view.findViewById(R.id.checkBoxNotificacao);
         seekArea = (SeekBar) view.findViewById(R.id.seekArea);
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.orderByChild("username").equalTo(currentUser.getUsername());
+        com.google.firebase.database.Query queryRef = mFirebaseDatabaseReference.orderByChild("username").equalTo(currentUser.getUsername());
+        queryRef.addChildEventListener(new com.google.firebase.database.ChildEventListener() {
 
-        queryRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot snapshot, String previousChild) {
-                User user = snapshot.getValue(User.class);
+            public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+                User user = dataSnapshot.getValue(User.class);
                 if(user != null) {
                     checkBoxNotificacao.setChecked(user.isNotificacoes());
                     seekArea.setProgress(user.getAreaBusca());
                 }
             }
-            @Override public void onChildRemoved(DataSnapshot dataSnapshot) { }
-            @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-            @Override public void onCancelled(FirebaseError firebaseError) { }
+            @Override public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) { }
+            @Override public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {}
+            @Override public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
+            @Override public void onCancelled(DatabaseError databaseError) {}
         });
 
         addListenerOnButton(view);
@@ -79,12 +84,10 @@ public class ConfigFragment extends Fragment {
                 String dados = "Notificacao?"+(checkBoxNotificacao.isChecked()?"True":"False");
                 dados += ", Area:"+seekArea.getProgress();
 
-                Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                Firebase myref = myFirebaseRef.child("users").child(currentUser.getUsername());
                 Map<String, Object> updatedUser = new HashMap<String, Object>();
                 updatedUser.put("notificacoes", checkBoxNotificacao.isChecked());
                 updatedUser.put("areaBusca", seekArea.getProgress());
-                myref.updateChildren(updatedUser);
+                mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).updateChildren(updatedUser);
 
                 Toast.makeText(getContext(), dados, Toast.LENGTH_SHORT).show();
                 currentUser.setAreaBusca(seekArea.getProgress());

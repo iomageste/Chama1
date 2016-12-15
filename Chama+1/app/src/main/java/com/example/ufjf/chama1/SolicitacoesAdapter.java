@@ -14,6 +14,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -24,6 +27,8 @@ public class SolicitacoesAdapter  extends ArrayAdapter<Solicitacao> {
 
     TextView userName;
     TextView userTelefone;
+
+    private DatabaseReference mFirebaseDatabaseReference;
 
     public SolicitacoesAdapter(Context context, ArrayList<Solicitacao> solicitacoes){
         super(context,0, solicitacoes);
@@ -44,25 +49,25 @@ public class SolicitacoesAdapter  extends ArrayAdapter<Solicitacao> {
         userName.setText(String.valueOf(solicitacao.getUsername_busca()));
         String pendente = (solicitacao.isAprovado() ? "Solicitação aprovada!": "Solicitação pendente...");
         userTelefone.setText(pendente);
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         if(solicitacao.isAprovado()){
-            Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-            Query queryRef = myFirebaseRef.orderByChild("username").equalTo(solicitacao.getUsername_busca());
+            com.google.firebase.database.Query queryRef = mFirebaseDatabaseReference.child("users").orderByChild("username").equalTo(solicitacao.getUsername_busca());
 
-            queryRef.addChildEventListener(new ChildEventListener() {
+            queryRef.addChildEventListener(new com.google.firebase.database.ChildEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot snapshot, String previousChild) {
-                    User user = snapshot.getValue(User.class);
+                public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+                    User user = dataSnapshot.getValue(User.class);
                     if(user != null){
-                        userName.setText(user.getNome()+" "+user.getTelefone());
+                        userName.setText(user.getUsername()+" "+user.getTelefone());
                         userTelefone.setText("Solicitação aprovada!");
                     }
                 }
 
-                @Override public void onChildRemoved(DataSnapshot dataSnapshot) { }
-                @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-                @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-                @Override public void onCancelled(FirebaseError firebaseError) { }
+                @Override public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
+                @Override public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {}
+                @Override public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
+                @Override public void onCancelled(DatabaseError databaseError) {}
             });
         }
         // Return the completed view to render on screen

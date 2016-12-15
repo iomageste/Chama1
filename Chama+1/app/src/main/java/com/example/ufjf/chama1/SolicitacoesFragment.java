@@ -14,6 +14,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -27,6 +30,8 @@ public class SolicitacoesFragment extends Fragment {
     SolicitacoesAdapter adapter;
     User currentUser;
 
+    private DatabaseReference mFirebaseDatabaseReference;
+
     public SolicitacoesFragment() {
         // Required empty public constructor
     }
@@ -38,6 +43,7 @@ public class SolicitacoesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_solicitacoes, container, false);
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         listSolicitacoes =  (ListView) view.findViewById(R.id.listSolicitacoes);
 
@@ -45,23 +51,22 @@ public class SolicitacoesFragment extends Fragment {
         adapter = new SolicitacoesAdapter(getContext(), solicitacoes);
 
         listSolicitacoes.setAdapter(adapter);
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-        myFirebaseRef.child("solicitacoes").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    adapter.clear();
-                    for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                        Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
+        mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                adapter.clear();
+                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
 
-                        if (solicitacao != null && solicitacao.getSolicitante_username().equals(currentUser.getUsername())) {
-                            adapter.add(solicitacao);
-                        }
+                    if (solicitacao != null && solicitacao.getSolicitante_username().equals(currentUser.getUsername())) {
+                        adapter.add(solicitacao);
                     }
-
                 }
+            }
 
-                @Override public void onCancelled(FirebaseError error) { }
+            @Override public void onCancelled(DatabaseError databaseError) { }
         });
+
 
         return view;
     }

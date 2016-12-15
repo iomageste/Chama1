@@ -32,48 +32,21 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyArpbieqG2WCh8umwmpvd4-CEU213V3Ytk" />
+            android:value="AIzaSyDUmDBqzPiy6OQHxL1cUpXo1I-ypINVqDE" />
 
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login">
+            android:name=".MainActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" />
 
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+        <activity android:name=".SignInActivity"> </activity>
 
-                <category android:name="com.example.gcm" />
-            </intent-filter>
-        </receiver>
 
-        <service
-            android:name="com.example.ufjf.gcm.MyGcmListenerService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-            </intent-filter>
-        </service>
-        <service
-            android:name="com.example.ufjf.gcm.MyInstanceIDListenerService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
-            </intent-filter>
-        </service>
-
-        <activity android:name=".RegisterActivity"></activity>
     </application>
 
 </manifest>

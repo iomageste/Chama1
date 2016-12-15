@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.example.ufjf.model.User;
 import com.firebase.client.Firebase;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -13,6 +14,7 @@ public class CustomApplication extends Application {
 
     User currentUser;
     LatLng currentLocation;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     public void onCreate() {
@@ -32,7 +34,9 @@ public class CustomApplication extends Application {
         return currentLocation;
     }
 
-    public void setCurrentLocation(LatLng currentLocation) {
-        this.currentLocation = currentLocation;
-    }
+    public void setCurrentLocation(LatLng currentLocation) { this.currentLocation = currentLocation; }
+
+    public GoogleApiClient getmGoogleApiClient() { return mGoogleApiClient; }
+
+    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {this.mGoogleApiClient = mGoogleApiClient; }
 }

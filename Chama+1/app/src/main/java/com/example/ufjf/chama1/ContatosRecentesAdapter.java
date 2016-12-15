@@ -14,6 +14,9 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -24,6 +27,8 @@ public class ContatosRecentesAdapter extends ArrayAdapter<Contato>{
 
     TextView userName;
     TextView userTelefone;
+
+    private DatabaseReference mFirebaseDatabaseReference;
 
     public ContatosRecentesAdapter(Context context, ArrayList<Contato> contatos){
         super(context,0, contatos);
@@ -46,25 +51,25 @@ public class ContatosRecentesAdapter extends ArrayAdapter<Contato>{
         // Populate the data into the template view using the data object
         userName.setText(contato.getContato());
         userTelefone.setText("Carregando...");
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/users");
-        Query queryRef = myFirebaseRef.child(contato.getContato());
+        DatabaseReference queryRef = mFirebaseDatabaseReference.child("users").child(contato.getContato());
 
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            public void onDataChange(DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-
+        queryRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
                 if(user != null){
-                    userName.setText(user.getNome());
+                    userName.setText(user.getUsername());
                     userTelefone.setText(user.getTelefone());
                 }
             }
+
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
-
 
         // Return the completed view to render on screen
         return convertView;

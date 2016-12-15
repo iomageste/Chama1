@@ -19,6 +19,8 @@ import com.example.ufjf.model.Busca;
 import com.example.ufjf.model.User;
 import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 /**
@@ -36,9 +38,10 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     User currentUser;
     LatLng currentLoc;
 
+    private DatabaseReference mFirebaseDatabaseReference;
+
     public Chama1Fragment() {
         // Required empty public constructor
-
     }
 
 
@@ -48,6 +51,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chama1, container, false);
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         buttonBuscar = (Button) view.findViewById(R.id.buttonBuscar);
         spinnerChamaMais = (Spinner) view.findViewById(R.id.spinnerChamaMais);
@@ -86,8 +90,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                 Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), currentLoc.latitude, currentLoc.longitude);
 
                 Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
-                Firebase myFirebaseRef = new Firebase("https://chama1-e883c.firebaseio.com/");
-                myFirebaseRef.child("buscas").child(currentUser.getUsername()).setValue(busca);
+                mFirebaseDatabaseReference.child("buscas").child(currentUser.getUsername()).setValue(busca);
 
                 Bundle args = new Bundle();
                 int areaBusca = seekArea.getProgress()*1000; // quilometros

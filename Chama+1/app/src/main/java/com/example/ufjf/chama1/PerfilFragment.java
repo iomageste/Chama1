@@ -73,13 +73,15 @@ public class PerfilFragment extends Fragment {
         buttonSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                String new_name = editUserName.getText().toString();
+                /*String new_name = editUserName.getText().toString();
                 String new_tel = editTelefone.getText().toString();
 
                 Map<String, Object> updatedUser = new HashMap<String, Object>();
                 updatedUser.put("nome", new_name);
                 updatedUser.put("telefone", new_tel);
-                mFirebaseDatabaseReference.child("users").child(username).updateChildren(updatedUser);
+                mFirebaseDatabaseReference.child("users").child(username).updateChildren(updatedUser);*/
+                MyFirebaseMessagingService svc = new MyFirebaseMessagingService();
+                svc.sendNotification("MinhaMensagem", getActivity(), getContext());
 
             }
         });

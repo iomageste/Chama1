@@ -133,6 +133,8 @@ public class PeladasFragment extends Fragment implements
                     Busca pelada = postSnapshot.getValue(Busca.class);
                     if(pelada != null && !pelada.getUsername().equals(currentUser.getUsername())){
                         novasPeladas.add(pelada);
+                        MyFirebaseMessagingService svc = new MyFirebaseMessagingService();
+                        svc.sendNotification("MinhaMensagem", getActivity(), getContext());
                     }
                 }
             }

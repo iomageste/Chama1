@@ -11,6 +11,7 @@
     >
 
     <ImageView
+        android:id="@+id/user_image"
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:src="@drawable/default_profile_image"
@@ -23,6 +24,7 @@
         android:layout_height="match_parent"
 
         android:text="Usuario"
+        android:layout_marginLeft="30dp"
         android:textSize="22sp"
         android:textStyle="bold" />
 

@@ -8,7 +8,7 @@
         android:layout_width="144dp"
         android:layout_height="144dp"
         android:id="@+id/imageView"
-        android:layout_marginTop="110dp"
+        android:layout_marginTop="130dp"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/default_profile_image" />
 
@@ -18,7 +18,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Nome: "
         android:id="@+id/labelNome"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="290dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginRight="80dp" />
 
@@ -28,7 +28,7 @@
         android:id="@+id/textNome"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="280dp"
         android:layout_marginLeft="60dp" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Telefone"
         android:id="@+id/labelTelefone"
-        android:layout_marginTop="300dp"
+        android:layout_marginTop="340dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginRight="80dp" />
 
@@ -47,7 +47,7 @@
         android:id="@+id/textTelefone"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="290dp"
+        android:layout_marginTop="330dp"
         android:layout_marginLeft="60dp" />
 
 
@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:text="Salvar"
         android:id="@+id/buttonSalvar"
-        android:layout_marginTop="490dp"
+        android:layout_marginTop="530dp"
         android:layout_marginLeft="-70dp"
         android:layout_gravity="center_horizontal" />
 
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:text="Logout"
         android:id="@+id/buttonLogout"
-        android:layout_marginTop="490dp"
+        android:layout_marginTop="530dp"
         android:layout_marginLeft="70dp"
         android:layout_gravity="center_horizontal" />
 

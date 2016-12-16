@@ -3,13 +3,18 @@ package com.example.ufjf.chama1;
 
 import android.app.Application;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.example.ufjf.model.User;
 import com.firebase.client.ChildEventListener;
@@ -22,6 +27,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +46,7 @@ public class PerfilFragment extends Fragment {
     Button buttonSalvar;
     Button buttonLogout;
     View view;
+    ImageView imageView;
     User currentUser;
 
     private DatabaseReference mFirebaseDatabaseReference;
@@ -63,8 +71,27 @@ public class PerfilFragment extends Fragment {
         buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
         addListenerOnButton(view);
 
+
+
         editUserName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         editTelefone.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+        imageView = (ImageView) view.findViewById(R.id.imageView);
+        Picasso.with(getActivity()).load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl())
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                        RoundedBitmapDrawable imageDrawable = RoundedBitmapDrawableFactory.create(getResources(), imageBitmap);
+                        imageDrawable.setCircular(true);
+                        imageDrawable.setCornerRadius(Math.max(imageBitmap.getWidth(), imageBitmap.getHeight()) / 2.0f);
+                        imageView.setImageDrawable(imageDrawable);
+                    }
+                    @Override
+                    public void onError() {
+                        //imageView.setImageResource(R.drawable.default_image);
+                    }
+                });
 
         return view;
     }

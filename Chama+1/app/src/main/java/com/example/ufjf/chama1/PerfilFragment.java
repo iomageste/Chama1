@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ufjf.model.User;
 import com.firebase.client.ChildEventListener;
@@ -39,10 +41,9 @@ import java.util.Map;
  */
 public class PerfilFragment extends Fragment {
 
-    EditText editUserName;
+    TextView editUserName;
+    TextView editEmail;
     EditText editTelefone;
-    String username;
-    String telefone;
     Button buttonSalvar;
     Button buttonLogout;
     View view;
@@ -65,16 +66,16 @@ public class PerfilFragment extends Fragment {
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        editUserName = (EditText) view.findViewById(R.id.textNome);
+        editUserName = (TextView) view.findViewById(R.id.textNome);
+        editEmail = (TextView) view.findViewById(R.id.textEmail);
         editTelefone = (EditText) view.findViewById(R.id.textTelefone);
         buttonSalvar = (Button) view.findViewById(R.id.buttonSalvar);
         buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
         addListenerOnButton(view);
 
-
-
         editUserName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        editTelefone.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        editEmail.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        editTelefone.setText(currentUser.getTelefone());
 
         imageView = (ImageView) view.findViewById(R.id.imageView);
         Picasso.with(getActivity()).load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl())
@@ -101,14 +102,16 @@ public class PerfilFragment extends Fragment {
             @Override
             public void onClick(View arg0) {
                 /*String new_name = editUserName.getText().toString();
-                String new_tel = editTelefone.getText().toString();
+
 
                 Map<String, Object> updatedUser = new HashMap<String, Object>();
                 updatedUser.put("nome", new_name);
                 updatedUser.put("telefone", new_tel);
                 mFirebaseDatabaseReference.child("users").child(username).updateChildren(updatedUser);*/
-                MyFirebaseMessagingService svc = new MyFirebaseMessagingService();
-                svc.sendNotification("MinhaMensagem", getActivity(), getContext());
+                String new_tel = editTelefone.getText().toString();
+                currentUser.setTelefone(new_tel);
+                mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).setValue(currentUser);
+                Toast.makeText(getContext(), "Seus dados de perfil foram atualizados.", Toast.LENGTH_SHORT).show();
 
             }
         });

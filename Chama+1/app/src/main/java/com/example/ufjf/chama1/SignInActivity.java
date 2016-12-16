@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.ufjf.model.Solicitacao;
 import com.example.ufjf.model.User;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -23,8 +24,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -128,9 +135,28 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
                             FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             String imgUrl = mFirebaseUser.getPhotoUrl().getScheme()+":"+mFirebaseUser.getPhotoUrl().getSchemeSpecificPart();
-                            User user = new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail(), imgUrl);
-                            mFirebaseDatabaseReference.child("users").child(mFirebaseUser.getDisplayName()).setValue(user);
-                            ((CustomApplication)getApplication()).setCurrentUser(user);
+                            final User currentUser = new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail(), imgUrl);
+                            mFirebaseDatabaseReference.child("users").child(mFirebaseUser.getDisplayName()).setValue(currentUser);
+                            ((CustomApplication)getApplication()).setCurrentUser(currentUser);
+
+                            mFirebaseDatabaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (com.google.firebase.database.DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                                        User user = postSnapshot.getValue(User.class);
+                                        if(user != null && user.getUsername().equals(currentUser.getUsername())){
+                                            return;
+                                        }
+                                        DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                                        mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).setValue(currentUser);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
 
                             startActivity(new Intent(SignInActivity.this, MainActivity.class));
                             finish();

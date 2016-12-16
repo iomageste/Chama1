@@ -4,6 +4,8 @@ package com.example.ufjf.chama1;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,12 +19,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ufjf.model.Contato;
 import com.example.ufjf.model.Solicitacao;
 import com.example.ufjf.model.User;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
@@ -36,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +70,7 @@ public class Chama1MapaFragment extends Fragment implements
 
         CustomInfoWindowAdapter(Bundle savedInstanceState) {
             //mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
-            mContents =  getLayoutInflater(savedInstanceState).inflate(R.layout.custom_info_contents, null);
+            mContents = getLayoutInflater(savedInstanceState).inflate(R.layout.custom_info_contents, null);
         }
 
         @Override
@@ -82,12 +87,11 @@ public class Chama1MapaFragment extends Fragment implements
         private void render(Marker marker, View view) {
             String title = marker.getTitle();
             TextView titleUi = ((TextView) view.findViewById(R.id.title));
-            if(title != null){
+            if (title != null) {
                 SpannableString titleText = new SpannableString("MARKER TITULO");
                 titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
                 titleUi.setText(titleText);
-            }
-            else {
+            } else {
                 titleUi.setText("MARKER TITULO == NULL");
             }
 
@@ -115,7 +119,6 @@ public class Chama1MapaFragment extends Fragment implements
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -134,17 +137,20 @@ public class Chama1MapaFragment extends Fragment implements
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                 novosPeladeiros.clear();
-                for (com.google.firebase.database.DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
-                    if(solicitacao != null
+                    if (solicitacao != null
                             && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
-                            && !solicitacao.isAprovado()){
+                            && !solicitacao.isAprovado()) {
                         novosPeladeiros.add(solicitacao);
                     }
                 }
 
             }
-            @Override public void onCancelled(DatabaseError error) { }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
         });
 
         gMapView = (MapView) view.findViewById(R.id.map);
@@ -223,17 +229,17 @@ public class Chama1MapaFragment extends Fragment implements
 
                 // Somente exibe solicitação se ela estiver dentro da área de busca definida para
                 // esta pelada
-                if(distancia < Double.valueOf(areaBusca) || areaBusca == 0){
+                if (distancia < Double.valueOf(areaBusca) || areaBusca == 0) {
                     int height = 100;
                     int width = 100;
-                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
-                    Bitmap b=bitmapdraw.getBitmap();
+                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.default_profile_image);
+                    Bitmap b = bitmapdraw.getBitmap();
                     Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
                     LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
                     myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-                    for (User user: (((CustomApplication) getActivity().getApplication()).getUserList())){
-                        if(user.getUsername().equals(solicitacao.getSolicitante_username())){
+                    for (User user : (((CustomApplication) getActivity().getApplication()).getUserList())) {
+                        if (user.getUsername().equals(solicitacao.getSolicitante_username())) {
                             PicassoMarker marker = new PicassoMarker(myMarker);
                             Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
                         }
@@ -247,47 +253,65 @@ public class Chama1MapaFragment extends Fragment implements
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Toast.makeText(getContext(),  "TESTE", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "TESTE", Toast.LENGTH_SHORT).show();
         return true;
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getContext(),  "Solicitação Aprovada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Solicitação Aprovada", Toast.LENGTH_SHORT).show();
 
         String username_currentUser = currentUser.getUsername();
 
         // usuario foi aprovado, reduz quantidade de usuarios faltando
         usuariosFaltando = usuariosFaltando - 1;
         String solicitante = marker.getTitle();
-        String solicitacao = solicitante+"-"+username_currentUser;
+        String solicitacao = solicitante + "-" + username_currentUser;
 
         // atualiza objetos de solicitacao e busca
         Map<String, Object> solicitacaoAprovada = new HashMap<String, Object>();
-        solicitacaoAprovada.put("solicitacoes/"+solicitacao+"/aprovado", true);
-        solicitacaoAprovada.put("buscas/"+username_currentUser+"/usuariosFaltando", usuariosFaltando );
+        solicitacaoAprovada.put("solicitacoes/" + solicitacao + "/aprovado", true);
+        solicitacaoAprovada.put("buscas/" + username_currentUser + "/usuariosFaltando", usuariosFaltando);
         mFirebaseDatabaseReference.updateChildren(solicitacaoAprovada);
         marker.remove();
 
-        // adiciona o dono da pelada aos contatos do peladeiro
-        Map<String, Object> cadastroContatos = new HashMap<String, Object>();
-        cadastroContatos.put("username", solicitante);
-        cadastroContatos.put("contato", username_currentUser);
-        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
+        Contato contato1 = new Contato(username_currentUser, solicitante);
+        Contato contato2 = new Contato(solicitante, username_currentUser);
 
-        // adiciona o peladeiro aos contatos do dono da pelada
-        cadastroContatos = new HashMap<String, Object>();
-        cadastroContatos.put("username",username_currentUser);
-        cadastroContatos.put("contato", solicitante);
-        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
+        mFirebaseDatabaseReference.child("contatos").child(username_currentUser + "-" + solicitante).setValue(contato1);
+        mFirebaseDatabaseReference.child("contatos").child(solicitante + "-" + username_currentUser).setValue(contato2);
 
         // caso não falte mais usuarios, exclui a busca do bd e redirecina pra contatos
-        if(usuariosFaltando == 0){
+        if (usuariosFaltando == 0) {
             mFirebaseDatabaseReference.child("buscas").child(username_currentUser).removeValue();
             ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
             view.setCurrentItem(4, true);
         }
 
+    }
+
+    public LatLng searchAddress(String strAddress) {
+        Geocoder coder = new Geocoder(getContext());
+        List<Address> address;
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address != null) {
+                Address loc = address.get(0);
+                loc.getLatitude();
+                loc.getLongitude();
+
+                LatLng myLocal = new LatLng(loc.getLatitude(), loc.getLongitude());
+                /* Centraliza a camera */
+                gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocal, 15));
+                return myLocal;
+//                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("CHUPAAAAA MUNDO!"));
+//                marcadoresPeladas.put("CHUPAAAAA MUNDO!", myMarker);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

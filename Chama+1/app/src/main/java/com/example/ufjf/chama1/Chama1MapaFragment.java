@@ -275,7 +275,7 @@ public class Chama1MapaFragment extends Fragment implements
         mFirebaseDatabaseReference.updateChildren(solicitacaoAprovada);
         marker.remove();
 
-        Contato contato1 = new Contato(username_currentUser,  solicitante);
+        Contato contato1 = new Contato(username_currentUser, solicitante);
         Contato contato2 = new Contato(solicitante, username_currentUser);
 
         mFirebaseDatabaseReference.child("contatos").child(username_currentUser + "-" + solicitante).setValue(contato1);

@@ -119,7 +119,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
         fragmentManager = getSupportFragmentManager();
 
-        mFirebaseDatabaseReference.child("users").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        mFirebaseDatabaseReference.child("users").addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
                 ((CustomApplication)getApplication()).clearUserList();

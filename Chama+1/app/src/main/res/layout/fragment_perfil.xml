@@ -5,12 +5,12 @@
     tools:context="com.example.ufjf.chama1.PerfilFragment">
 
     <ImageView
-        android:layout_width="144dp"
-        android:layout_height="144dp"
-        android:id="@+id/imageView"
-        android:layout_marginTop="130dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/default_profile_image" />
+    android:layout_width="144dp"
+    android:layout_height="144dp"
+    android:id="@+id/imageView"
+    android:layout_marginTop="130dp"
+    android:layout_gravity="center_horizontal"
+    android:src="@drawable/default_profile_image" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginRight="80dp" />
 
-    <EditText
+    <TextView
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:id="@+id/textNome"
@@ -35,9 +35,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Nome: "
+        android:id="@+id/labelEmail"
+        android:layout_marginTop="340dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="80dp" />
+
+    <TextView
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textEmail"
+        android:layout_gravity="center_horizontal|top"
+        android:text=" "
+        android:layout_marginTop="330dp"
+        android:layout_marginLeft="60dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Telefone"
         android:id="@+id/labelTelefone"
-        android:layout_marginTop="340dp"
+        android:layout_marginTop="390dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginRight="80dp" />
 
@@ -47,7 +66,7 @@
         android:id="@+id/textTelefone"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="380dp"
         android:layout_marginLeft="60dp" />
 
 
@@ -56,7 +75,7 @@
         android:layout_height="wrap_content"
         android:text="Salvar"
         android:id="@+id/buttonSalvar"
-        android:layout_marginTop="530dp"
+        android:layout_marginTop="510dp"
         android:layout_marginLeft="-70dp"
         android:layout_gravity="center_horizontal" />
 
@@ -65,7 +84,7 @@
         android:layout_height="wrap_content"
         android:text="Logout"
         android:id="@+id/buttonLogout"
-        android:layout_marginTop="530dp"
+        android:layout_marginTop="510dp"
         android:layout_marginLeft="70dp"
         android:layout_gravity="center_horizontal" />
 

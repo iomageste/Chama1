@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ufjf.model.Contato;
 import com.example.ufjf.model.Solicitacao;
 import com.example.ufjf.model.User;
 import com.firebase.client.DataSnapshot;
@@ -269,17 +270,11 @@ public class Chama1MapaFragment extends Fragment implements
         mFirebaseDatabaseReference.updateChildren(solicitacaoAprovada);
         marker.remove();
 
-        // adiciona o dono da pelada aos contatos do peladeiro
-        Map<String, Object> cadastroContatos = new HashMap<String, Object>();
-        cadastroContatos.put("username", solicitante);
-        cadastroContatos.put("contato", username_currentUser);
-        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
+        Contato contato1 = new Contato(username_currentUser,  solicitante);
+        Contato contato2 = new Contato(solicitante, username_currentUser);
 
-        // adiciona o peladeiro aos contatos do dono da pelada
-        cadastroContatos = new HashMap<String, Object>();
-        cadastroContatos.put("username",username_currentUser);
-        cadastroContatos.put("contato", solicitante);
-        mFirebaseDatabaseReference.child("contatos").push().setValue(cadastroContatos);
+        mFirebaseDatabaseReference.child("contatos").child(username_currentUser+"-"+solicitante).setValue(contato1);
+        mFirebaseDatabaseReference.child("contatos").child(solicitante+"-"+username_currentUser).setValue(contato2);
 
         // caso não falte mais usuarios, exclui a busca do bd e redirecina pra contatos
         if(usuariosFaltando == 0){

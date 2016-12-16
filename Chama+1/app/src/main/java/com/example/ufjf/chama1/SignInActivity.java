@@ -130,8 +130,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            // TODO: Vê se user já está registrado, se não, registra ele aqui
-                            // Save (if new user) on firebase
+
                             DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
                             FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             String imgUrl = mFirebaseUser.getPhotoUrl().getScheme()+":"+mFirebaseUser.getPhotoUrl().getSchemeSpecificPart();

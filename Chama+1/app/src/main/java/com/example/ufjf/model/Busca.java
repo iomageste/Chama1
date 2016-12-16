@@ -11,6 +11,7 @@ public class Busca {
     private int areaBusca;
     private double latitude;
     private double longitude;
+    private String address;
 
     public Busca() {
     }
@@ -20,13 +21,14 @@ public class Busca {
         this.usuariosFaltando = usuariosFaltando;
     }
 
-    public Busca(String username, int usuariosFaltando, String tipo, int areaBusca, double latitude, double longitude) {
+    public Busca(String username, int usuariosFaltando, String tipo, int areaBusca, double latitude, double longitude, String address) {
         this.username = username;
         this.usuariosFaltando = usuariosFaltando;
         this.tipo = tipo;
         this.areaBusca = areaBusca;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.address = address;
     }
 
     public String getUsername() {
@@ -75,5 +77,13 @@ public class Busca {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

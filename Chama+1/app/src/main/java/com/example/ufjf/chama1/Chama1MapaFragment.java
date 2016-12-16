@@ -26,6 +26,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -128,30 +129,9 @@ public class Chama1MapaFragment extends Fragment implements
         usuariosFaltando = Integer.parseInt(getArguments().getString("Chama+"));
         //currentUser = getResources().getString(R.string.current_user);
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
-
-        novosPeladeiros = new ArrayList<>();
-        marcadoresPeladeiros = new HashMap<String, Marker>();
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-
-        mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                novosPeladeiros.clear();
-                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
-                    if (solicitacao != null
-                            && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
-                            && !solicitacao.isAprovado()) {
-                        novosPeladeiros.add(solicitacao);
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
+        Double lat = getArguments().getDouble("Lat");
+        Double lng = getArguments().getDouble("Lng");
+        currentLoc = new LatLng(lat, lng);
 
         gMapView = (MapView) view.findViewById(R.id.map);
         gMapView.onCreate(savedInstanceState);
@@ -163,6 +143,63 @@ public class Chama1MapaFragment extends Fragment implements
             e.printStackTrace();
         }
 
+        novosPeladeiros = new ArrayList<>();
+        marcadoresPeladeiros = new HashMap<String, Marker>();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
+        mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+                for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
+                    if (solicitacao != null
+                            && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
+                            && !solicitacao.isAprovado()) {
+
+                        for (String username : marcadoresPeladeiros.keySet()) {
+                            if (solicitacao.getSolicitante_username().equals(username)) {
+                                marcadoresPeladeiros.get(username).remove();
+                                break;
+                            }
+                        }
+
+                        float[] results = new float[1];
+                        Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
+                                solicitacao.getLatitude(), solicitacao.getLongitude(), results);
+                        double distancia = results[0];
+
+                        // Somente exibe solicitação se ela estiver dentro da área de busca definida para
+                        // esta pelada
+                        if (distancia < Double.valueOf(areaBusca) || areaBusca == 0) {
+                            BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.default_profile_image);
+                            Bitmap b = bitmapdraw.getBitmap();
+                            Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
+                            LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
+                            myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                            for (User user : (((CustomApplication) getActivity().getApplication()).getUserList())) {
+                                if (user.getUsername().equals(solicitacao.getSolicitante_username())) {
+                                    PicassoMarker marker = new PicassoMarker(myMarker);
+                                    Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
+                                }
+                            }
+                            marcadoresPeladeiros.put(solicitacao.getSolicitante_username(), myMarker);
+                        }
+
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
+
+
         // dispara notificações para usuários
 
         return view;
@@ -173,10 +210,13 @@ public class Chama1MapaFragment extends Fragment implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         gMap = googleMap;
-        gMap.getUiSettings().setMyLocationButtonEnabled(true);
-        gMap.setMyLocationEnabled(true);
-        gMap.setOnMyLocationChangeListener(myLocationChangeListener);
+        //gMap.getUiSettings().setMyLocationButtonEnabled(true);
+        //gMap.setMyLocationEnabled(true);
+
+        //gMap.setOnMyLocationChangeListener(myLocationChangeListener);
         //gMap.setOnMarkerClickListener(this);
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 15));
+        gMap.addMarker(new MarkerOptions().position(currentLoc));
         gMap.setOnInfoWindowClickListener(this);
     }
 
@@ -212,7 +252,6 @@ public class Chama1MapaFragment extends Fragment implements
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
-            currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
 
             for (Solicitacao solicitacao : novosPeladeiros) {
                 for (String username : marcadoresPeladeiros.keySet()) {
@@ -288,30 +327,6 @@ public class Chama1MapaFragment extends Fragment implements
             view.setCurrentItem(4, true);
         }
 
-    }
-
-    public LatLng searchAddress(String strAddress) {
-        Geocoder coder = new Geocoder(getContext());
-        List<Address> address;
-        try {
-            address = coder.getFromLocationName(strAddress, 5);
-            if (address != null) {
-                Address loc = address.get(0);
-                loc.getLatitude();
-                loc.getLongitude();
-
-                LatLng myLocal = new LatLng(loc.getLatitude(), loc.getLongitude());
-                /* Centraliza a camera */
-                gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocal, 15));
-                return myLocal;
-//                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("CHUPAAAAA MUNDO!"));
-//                marcadoresPeladas.put("CHUPAAAAA MUNDO!", myMarker);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
 }

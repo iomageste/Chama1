@@ -1,6 +1,8 @@
 package com.example.ufjf.chama1;
 
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -18,9 +21,13 @@ import android.widget.Toast;
 import com.example.ufjf.model.Busca;
 import com.example.ufjf.model.User;
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -29,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     Button buttonBuscar;
+    EditText editAddres;
     Spinner spinnerChamaMais;
     Spinner spinnerTipo;
     SeekBar seekArea;
@@ -37,6 +45,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     String tipo = "";
     User currentUser;
     LatLng currentLoc;
+    String address = "";
 
     private DatabaseReference mFirebaseDatabaseReference;
 
@@ -61,6 +70,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         adapterChamaMais.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerChamaMais.setAdapter(adapterChamaMais);
         spinnerChamaMais.setOnItemSelectedListener(this);
+        editAddres = (EditText) view.findViewById(R.id.address);
 
         spinnerTipo = (Spinner) view.findViewById(R.id.spinnerTipo);
         ArrayAdapter<CharSequence> adapterTipo = ArrayAdapter.createFromResource(getContext(),
@@ -86,15 +96,22 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onClick(View arg0) {
 
-                currentLoc = ((CustomApplication) getActivity().getApplication()).getCurrentLocation();
-                Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), currentLoc.latitude, currentLoc.longitude);
+                address = editAddres.getText().toString();
 
-                Toast.makeText(getContext(), "Busca iniciada...", Toast.LENGTH_SHORT).show();
+                currentLoc = searchAddress(address);
+                if (currentLoc == null) {
+                    currentLoc = ((CustomApplication) getActivity().getApplication()).getCurrentLocation();
+                }
+                Busca busca = new Busca(currentUser.getUsername(), chamaMais, tipo, seekArea.getProgress(), currentLoc.latitude, currentLoc.longitude, address);
+
+                Toast.makeText(getContext(), "Busca iniciada..." + address, Toast.LENGTH_SHORT).show();
                 mFirebaseDatabaseReference.child("buscas").child(currentUser.getUsername()).setValue(busca);
 
                 Bundle args = new Bundle();
-                int areaBusca = seekArea.getProgress()*1000; // quilometros
+                int areaBusca = seekArea.getProgress() * 1000; // quilometros
                 args.putString("AreaBusca", String.valueOf(areaBusca));
+                args.putDouble("Lat", currentLoc.latitude);
+                args.putDouble("Lng", currentLoc.longitude);
                 args.putString("Chama+", String.valueOf(chamaMais));
                 Fragment fragment = new Chama1MapaFragment();
                 fragment.setArguments(args);
@@ -113,13 +130,10 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         Spinner spinner = (Spinner) parent;
-        if(spinner.getId() == R.id.spinnerChamaMais)
-        {
-            chamaMais =  Integer.valueOf(parent.getItemAtPosition(pos).toString());
+        if (spinner.getId() == R.id.spinnerChamaMais) {
+            chamaMais = Integer.valueOf(parent.getItemAtPosition(pos).toString());
             //Toast.makeText(getContext(),  parent.getItemAtPosition(pos).toString(), Toast.LENGTH_SHORT).show();
-        }
-        else if(spinner.getId() == R.id.spinnerTipo)
-        {
+        } else if (spinner.getId() == R.id.spinnerTipo) {
             tipo = parent.getItemAtPosition(pos).toString();
             //Toast.makeText(getContext(),  parent.getItemAtPosition(pos).toString(), Toast.LENGTH_SHORT).show();
         }
@@ -131,6 +145,28 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         // Another interface callback
     }
 
+    public LatLng searchAddress(String strAddress) {
+        Geocoder coder = new Geocoder(getContext());
+        List<Address> address;
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (!address.isEmpty()) {
+                Address loc = address.get(0);
+                loc.getLatitude();
+                loc.getLongitude();
 
+//                LatLng myLocal =
+                /* Centraliza a camera */
+                //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocal, 15));
+                return new LatLng(loc.getLatitude(), loc.getLongitude());
+//                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("CHUPAAAAA MUNDO!"));
+//                marcadoresPeladas.put("CHUPAAAAA MUNDO!", myMarker);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 }

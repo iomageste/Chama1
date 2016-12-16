@@ -1,8 +1,8 @@
 package com.example.ufjf.chama1;
 
 
-
 import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
@@ -25,6 +25,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
@@ -65,14 +66,14 @@ public class PeladasFragment extends Fragment implements
         private final View mContents;
 
         CustomInfoWindowAdapter(Bundle savedInstanceState) {
-            mContents =  getLayoutInflater(savedInstanceState).inflate(R.layout.custom_info_contents, null);
+            mContents = getLayoutInflater(savedInstanceState).inflate(R.layout.custom_info_contents, null);
             TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
             lat_long.setText("Distance");
         }
 
         @Override
         public View getInfoWindow(Marker marker) {
-                return null;
+            return null;
         }
 
         @Override
@@ -84,12 +85,11 @@ public class PeladasFragment extends Fragment implements
         private void render(Marker marker, View view) {
             String title = marker.getTitle();
             TextView titleUi = ((TextView) view.findViewById(R.id.title));
-            if(title != null){
+            if (title != null) {
                 SpannableString titleText = new SpannableString("Titulo Marker");
                 titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
                 titleUi.setText(titleText);
-            }
-            else {
+            } else {
                 titleUi.setText("Titulo Marker == null");
             }
 
@@ -131,16 +131,19 @@ public class PeladasFragment extends Fragment implements
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 novasPeladas.clear();
-                for (com.google.firebase.database.DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Busca pelada = postSnapshot.getValue(Busca.class);
-                    if(pelada != null && !pelada.getUsername().equals(currentUser.getUsername())){
+                    if (pelada != null && !pelada.getUsername().equals(currentUser.getUsername())) {
                         novasPeladas.add(pelada);
                         MyFirebaseMessagingService svc = new MyFirebaseMessagingService();
                         svc.sendNotification("MinhaMensagem", getActivity(), getContext());
                     }
                 }
             }
-            @Override public void onCancelled(DatabaseError databaseError) { }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
         // Mantém registro de solicitações do usuário atualizado de maneira assíncrona
@@ -148,14 +151,17 @@ public class PeladasFragment extends Fragment implements
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 userSolicitacoes.clear();
-                for (com.google.firebase.database.DataSnapshot postSnapshot: snapshot.getChildren()) {
+                for (com.google.firebase.database.DataSnapshot postSnapshot : snapshot.getChildren()) {
                     Solicitacao sol = postSnapshot.getValue(Solicitacao.class);
-                    if(sol != null && sol.getSolicitante_username().equals(currentUser.getUsername())){
+                    if (sol != null && sol.getSolicitante_username().equals(currentUser.getUsername())) {
                         userSolicitacoes.add(sol);
                     }
                 }
             }
-            @Override public void onCancelled(DatabaseError error) { }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
         });
 
         gMapView = (MapView) view.findViewById(R.id.map);
@@ -216,60 +222,60 @@ public class PeladasFragment extends Fragment implements
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
-              currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
-              ((CustomApplication) getActivity().getApplication()).setCurrentLocation(currentLoc);
+            currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+            ((CustomApplication) getActivity().getApplication()).setCurrentLocation(currentLoc);
 
-              for(Busca pelada: novasPeladas){
+            for (Busca pelada : novasPeladas) {
 
-                  // Se esta é uma busca do próprio usuário, remove o marcado
-                  for (String username :marcadoresPeladas.keySet()) {
-                      if(pelada.getUsername().equals(username)) {
-                          marcadoresPeladas.get(username).remove();
-                          break;
-                      }
-                  }
-                  // Verifica se a distância dessa pelada é menor que a distância mínima definida
-                  // pelo usuário para busca de peladas
-                  float[] distancia = new float[1];
-                  Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
-                         pelada.getLatitude(), pelada.getLongitude(), distancia);
+                // Se esta é uma busca do próprio usuário, remove o marcado
+                for (String username : marcadoresPeladas.keySet()) {
+                    if (pelada.getUsername().equals(username)) {
+                        marcadoresPeladas.get(username).remove();
+                        break;
+                    }
+                }
+                // Verifica se a distância dessa pelada é menor que a distância mínima definida
+                // pelo usuário para busca de peladas
+                float[] distancia = new float[1];
+                Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
+                        pelada.getLatitude(), pelada.getLongitude(), distancia);
 
-                  TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
-                  float distanciaKm = distancia[0]/1000;
-                  lat_long.setText("Distance"+distanciaKm);
+                TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
+                float distanciaKm = distancia[0] / 1000;
+                lat_long.setText("Distance" + distanciaKm);
 
-                  if (distanciaKm > currentUser.getAreaBusca() || distanciaKm > pelada.getAreaBusca())
-                     continue;
+                if (distanciaKm > currentUser.getAreaBusca() || distanciaKm > pelada.getAreaBusca())
+                    continue;
 
-                 float[] results = new float[1];
-                 Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                float[] results = new float[1];
+                Location.distanceBetween(location.getLatitude(), location.getLongitude(),
                         pelada.getLatitude(), pelada.getLongitude(), results);
 
-                 int height = 100;
-                 int width = 100;
-                 BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
-                 Bitmap b=bitmapdraw.getBitmap();
-                 Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                int height = 100;
+                int width = 100;
+                BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.default_profile_image);
+                Bitmap b = bitmapdraw.getBitmap();
+                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-                 LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
+                LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
 
-                 // Preenche texto do balão de acordo com a situação
-                 String marketText =  "Faltando: "+pelada.getUsuariosFaltando();
-                 for(Solicitacao sol: userSolicitacoes) {
-                     if(sol.getUsername_busca().equals(pelada.getUsername()))
-                         marketText = "Solicitação enviada...";
-                     break;
-                 }
+                // Preenche texto do balão de acordo com a situação
+                String marketText = "Faltando: " + pelada.getUsuariosFaltando();
+                for (Solicitacao sol : userSolicitacoes) {
+                    if (sol.getUsername_busca().equals(pelada.getUsername()))
+                        marketText = "Solicitação enviada...";
+                    break;
+                }
 
-                  BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
-                 myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet(marketText).icon(icon));
-                  for (User user: (((CustomApplication) getActivity().getApplication()).getUserList())){
-                      if(user.getUsername().equals(pelada.getUsername())){
-                          PicassoMarker marker = new PicassoMarker(myMarker);
-                          Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
-                      }
-                  }
-                 marcadoresPeladas.put(pelada.getUsername(), myMarker);
+                BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
+                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet(marketText).icon(icon));
+                for (User user : (((CustomApplication) getActivity().getApplication()).getUserList())) {
+                    if (user.getUsername().equals(pelada.getUsername())) {
+                        PicassoMarker marker = new PicassoMarker(myMarker);
+                        Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
+                    }
+                }
+                marcadoresPeladas.put(pelada.getUsername(), myMarker);
 
 
             }
@@ -285,10 +291,10 @@ public class PeladasFragment extends Fragment implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getContext(),  "Solicitação Enviada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Solicitação Enviada", Toast.LENGTH_SHORT).show();
 
         Solicitacao solicitacao = new Solicitacao(currentUser.getUsername(), marker.getTitle(), currentLoc.latitude, currentLoc.longitude);
-        mFirebaseDatabaseReference.child("solicitacoes").child(currentUser.getUsername()+"-"+marker.getTitle()).setValue(solicitacao);
+        mFirebaseDatabaseReference.child("solicitacoes").child(currentUser.getUsername() + "-" + marker.getTitle()).setValue(solicitacao);
 
         ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
         view.setCurrentItem(3, true);

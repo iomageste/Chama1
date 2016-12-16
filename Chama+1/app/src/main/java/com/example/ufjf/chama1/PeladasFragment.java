@@ -29,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -214,53 +216,61 @@ public class PeladasFragment extends Fragment implements
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
-            currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
-            ((CustomApplication) getActivity().getApplication()).setCurrentLocation(currentLoc);
+              currentLoc = new LatLng(location.getLatitude(), location.getLongitude());
+              ((CustomApplication) getActivity().getApplication()).setCurrentLocation(currentLoc);
 
-             for(Busca pelada: novasPeladas){
+              for(Busca pelada: novasPeladas){
 
-                 // Se esta é uma busca do próprio usuário, remove o marcado
-                 for (String username :marcadoresPeladas.keySet()) {
-                     if(pelada.getUsername().equals(username)) {
-                         marcadoresPeladas.get(username).remove();
-                         break;
-                     }
-                 }
-                 // Verifica se a distância dessa pelada é menor que a distância mínima definida
-                 // pelo usuário para busca de peladas
-                 float[] distancia = new float[1];
-                 Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
+                  // Se esta é uma busca do próprio usuário, remove o marcado
+                  for (String username :marcadoresPeladas.keySet()) {
+                      if(pelada.getUsername().equals(username)) {
+                          marcadoresPeladas.get(username).remove();
+                          break;
+                      }
+                  }
+                  // Verifica se a distância dessa pelada é menor que a distância mínima definida
+                  // pelo usuário para busca de peladas
+                  float[] distancia = new float[1];
+                  Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
                          pelada.getLatitude(), pelada.getLongitude(), distancia);
 
-                 TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
-                 float distanciaKm = distancia[0]/1000;
-                 lat_long.setText("Distance"+distanciaKm);
+                  TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
+                  float distanciaKm = distancia[0]/1000;
+                  lat_long.setText("Distance"+distanciaKm);
 
-                 if (distanciaKm > currentUser.getAreaBusca() || distanciaKm > pelada.getAreaBusca())
+                  if (distanciaKm > currentUser.getAreaBusca() || distanciaKm > pelada.getAreaBusca())
                      continue;
 
-                float[] results = new float[1];
-                Location.distanceBetween(location.getLatitude(), location.getLongitude(),
+                 float[] results = new float[1];
+                 Location.distanceBetween(location.getLatitude(), location.getLongitude(),
                         pelada.getLatitude(), pelada.getLongitude(), results);
 
-                int height = 100;
-                int width = 100;
-                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
-                Bitmap b=bitmapdraw.getBitmap();
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+                 int height = 100;
+                 int width = 100;
+                 BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.default_profile_image);
+                 Bitmap b=bitmapdraw.getBitmap();
+                 Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
 
-                LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
+                 LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
 
-                // Preenche texto do balão de acordo com a situação
-                String marketText =  "Faltando: "+pelada.getUsuariosFaltando();
-                for(Solicitacao sol: userSolicitacoes) {
-                    if(sol.getUsername_busca().equals(pelada.getUsername()))
-                        marketText = "Solicitação enviada...";
-                    break;
-                }
+                 // Preenche texto do balão de acordo com a situação
+                 String marketText =  "Faltando: "+pelada.getUsuariosFaltando();
+                 for(Solicitacao sol: userSolicitacoes) {
+                     if(sol.getUsername_busca().equals(pelada.getUsername()))
+                         marketText = "Solicitação enviada...";
+                     break;
+                 }
 
-                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet(marketText).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-                marcadoresPeladas.put(pelada.getUsername(), myMarker);
+                  BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(smallMarker);
+                 myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(pelada.getUsername()).snippet(marketText).icon(icon));
+                  for (User user: (((CustomApplication) getActivity().getApplication()).getUserList())){
+                      if(user.getUsername().equals(pelada.getUsername())){
+                          PicassoMarker marker = new PicassoMarker(myMarker);
+                          Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
+                      }
+                  }
+                 marcadoresPeladas.put(pelada.getUsername(), myMarker);
+
 
             }
         }

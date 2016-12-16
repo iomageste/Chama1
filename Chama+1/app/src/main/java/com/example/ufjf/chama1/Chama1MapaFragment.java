@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,6 +232,12 @@ public class Chama1MapaFragment extends Fragment implements
 
                     LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
                     myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    for (User user: (((CustomApplication) getActivity().getApplication()).getUserList())){
+                        if(user.getUsername().equals(solicitacao.getSolicitante_username())){
+                            PicassoMarker marker = new PicassoMarker(myMarker);
+                            Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
+                        }
+                    }
                     marcadoresPeladeiros.put(solicitacao.getSolicitante_username(), myMarker);
                 }
             }

@@ -127,7 +127,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             // Save (if new user) on firebase
                             DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
                             FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
-                            User user = new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
+                            String imgUrl = mFirebaseUser.getPhotoUrl().getScheme()+":"+mFirebaseUser.getPhotoUrl().getSchemeSpecificPart();
+                            User user = new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail(), imgUrl);
                             mFirebaseDatabaseReference.child("users").child(mFirebaseUser.getDisplayName()).setValue(user);
                             ((CustomApplication)getApplication()).setCurrentUser(user);
 

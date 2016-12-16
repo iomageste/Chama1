@@ -25,6 +25,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
@@ -61,9 +63,11 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
-            //return;
+            return;
         } else {
-            ((CustomApplication)getApplication()).setCurrentUser(new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail()));
+            String imgUrl =  mFirebaseUser.getPhotoUrl().getScheme()+":"+mFirebaseUser.getPhotoUrl().getSchemeSpecificPart();
+            ((CustomApplication)getApplication()).setCurrentUser(new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(),
+                    mFirebaseUser.getEmail(), imgUrl));
         }
 
         //toolbar = (Toolbar) findViewById(R.id.toolBar);
@@ -114,6 +118,23 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
         tabLayout.setupWithViewPager(viewPager);
 
         fragmentManager = getSupportFragmentManager();
+
+        mFirebaseDatabaseReference.child("users").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                ((CustomApplication)getApplication()).clearUserList();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    User user = postSnapshot.getValue(User.class);
+                    ((CustomApplication)getApplication()).addUserList(user);
+                    if(user.getUid().equals(mFirebaseAuth.getCurrentUser().getUid())){
+                        ((CustomApplication)getApplication()).setCurrentUser(user);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
 
 
     }

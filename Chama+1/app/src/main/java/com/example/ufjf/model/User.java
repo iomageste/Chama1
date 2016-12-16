@@ -1,6 +1,7 @@
 package com.example.ufjf.model;
 
 
+import android.net.Uri;
 
 /**
  * Created by eduar on 7/19/2016.
@@ -13,16 +14,19 @@ public class User {
     private String telefone;
     private boolean notificacoes;
     private int areaBusca;
+    private String user_image;
 
     public User() {
         this.areaBusca = 10;
         this.telefone = "(00) 0000-0000";
+        this.user_image = null;
     }
 
-    public User(String uid, String username, String email) {
+    public User(String uid, String username, String email, String user_image) {
         this.uid = uid;
         this.username = username;
         this.email = email;
+        this.user_image = user_image;
         this.areaBusca = 10;
         this.telefone = "(00) 0000-0000";
     }
@@ -32,15 +36,17 @@ public class User {
         this.telefone = telefone;
         this.areaBusca = 10;
         this.telefone = "(00) 0000-0000";
+        this.user_image = null;
     }
 
-    public User(String uid, String username, String email, String telefone, boolean notificacoes, int areaBusca) {
+    public User(String uid, String username, String email, String telefone, boolean notificacoes, int areaBusca, String user_image) {
         this.uid = uid;
         this.username = username;
         this.email = email;
         this.telefone = telefone;
         this.notificacoes = notificacoes;
         this.areaBusca = areaBusca;
+        this.user_image = user_image;
     }
 
     public String getUid() { return uid; }
@@ -79,4 +85,7 @@ public class User {
         this.areaBusca = areaBusca;
     }
 
+    public String getUser_image() { return user_image; }
+
+    public void setUser_image(String user_image) { this.user_image = user_image; }
 }

@@ -65,7 +65,6 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-
     }
 
     private void handleFirebaseAuthResult(AuthResult authResult) {
@@ -135,7 +134,6 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             String imgUrl = mFirebaseUser.getPhotoUrl().getScheme()+":"+mFirebaseUser.getPhotoUrl().getSchemeSpecificPart();
                             final User currentUser = new User(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail(), imgUrl);
-                            mFirebaseDatabaseReference.child("users").child(mFirebaseUser.getDisplayName()).setValue(currentUser);
                             ((CustomApplication)getApplication()).setCurrentUser(currentUser);
 
                             mFirebaseDatabaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -146,9 +144,9 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                                         if(user != null && user.getUsername().equals(currentUser.getUsername())){
                                             return;
                                         }
-                                        DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-                                        mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).setValue(currentUser);
                                     }
+                                    DatabaseReference mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+                                    mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).setValue(currentUser);
                                 }
 
                                 @Override

@@ -63,57 +63,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="2                     10                    100"
+        android:text="2                     50                    100"
         android:id="@+id/labelAreaValores"
         android:layout_marginTop="310dp"
         android:layout_gravity="center_horizontal"
          />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Começa em (min)"
-        android:id="@+id/labelComecaEm"
-        android:layout_marginTop="370dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="50dp" />
-
-    <SeekBar
-        android:layout_width="256dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/seekComecaEm"
-        android:layout_marginTop="410dp"
-        android:layout_gravity="center_horizontal"
-        android:max="120" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="5                     60                    120"
-        android:id="@+id/labelComecaEmValores"
-        android:layout_marginTop="440dp"
-        android:layout_gravity="center_horizontal"
-        />
-
     <EditText
         android:layout_height="wrap_content"
         android:id="@+id/address"
-        android:layout_marginTop="490dp"
+        android:layout_marginTop="370dp"
         android:layout_gravity="center_horizontal"
         android:layout_width="250dp"
         android:inputType="text"
         android:singleLine="true"
         style="@android:style/Widget.AutoCompleteTextView"
-        android:hint="Digite o endereço" />
+        android:hint="Digite o endereço (opcional)" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Buscar"
         android:id="@+id/buttonBuscar"
-        android:layout_marginTop="540dp"
+        android:layout_marginTop="450dp"
         android:layout_gravity="center_horizontal" />
 
 

@@ -20,35 +20,37 @@
         android:id="@+id/labelNome"
         android:layout_marginTop="290dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginRight="80dp" />
+        android:layout_marginRight="70dp" />
 
     <TextView
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:id="@+id/textNome"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="280dp"
-        android:layout_marginLeft="60dp" />
+        android:layout_marginTop="290dp"
+        android:layout_marginLeft="50dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Nome: "
+        android:text="Email: "
         android:id="@+id/labelEmail"
         android:layout_marginTop="340dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginRight="80dp" />
+        android:layout_marginRight="70dp" />
 
     <TextView
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:id="@+id/textEmail"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="330dp"
-        android:layout_marginLeft="60dp" />
+        android:layout_marginTop="340dp"
+        android:layout_marginLeft="50dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -56,9 +58,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Telefone"
         android:id="@+id/labelTelefone"
-        android:layout_marginTop="390dp"
+        android:layout_marginTop="410dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginRight="80dp" />
+        android:layout_marginRight="70dp" />
 
     <EditText
         android:layout_width="150dp"
@@ -66,8 +68,8 @@
         android:id="@+id/textTelefone"
         android:layout_gravity="center_horizontal|top"
         android:text=" "
-        android:layout_marginTop="380dp"
-        android:layout_marginLeft="60dp" />
+        android:layout_marginTop="400dp"
+        android:layout_marginLeft="50dp" />
 
 
     <Button

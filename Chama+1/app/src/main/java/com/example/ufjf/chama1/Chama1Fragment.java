@@ -20,8 +20,6 @@ import android.widget.Toast;
 
 import com.example.ufjf.model.Busca;
 import com.example.ufjf.model.User;
-import com.firebase.client.Firebase;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -29,10 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.IOException;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     Button buttonBuscar;
@@ -40,19 +34,17 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
     Spinner spinnerChamaMais;
     Spinner spinnerTipo;
     SeekBar seekArea;
-    SeekBar seekComecaEm;
     int chamaMais = 0;
-    String tipo = "";
     User currentUser;
     LatLng currentLoc;
     String address = "";
+    String tipo = "";
 
     private DatabaseReference mFirebaseDatabaseReference;
 
     public Chama1Fragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,10 +72,8 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         spinnerTipo.setAdapter(adapterTipo);
         spinnerTipo.setOnItemSelectedListener(this);
 
-        //editTipo = (EditText) view.findViewById(R.id.textTipo);
         seekArea = (SeekBar) view.findViewById(R.id.seekArea);
-        seekComecaEm = (SeekBar) view.findViewById(R.id.seekComecaEm);
-
+        seekArea.setProgress(50);
         addListenerOnButton(view);
 
         return view;
@@ -132,12 +122,9 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
         Spinner spinner = (Spinner) parent;
         if (spinner.getId() == R.id.spinnerChamaMais) {
             chamaMais = Integer.valueOf(parent.getItemAtPosition(pos).toString());
-            //Toast.makeText(getContext(),  parent.getItemAtPosition(pos).toString(), Toast.LENGTH_SHORT).show();
         } else if (spinner.getId() == R.id.spinnerTipo) {
             tipo = parent.getItemAtPosition(pos).toString();
-            //Toast.makeText(getContext(),  parent.getItemAtPosition(pos).toString(), Toast.LENGTH_SHORT).show();
         }
-
 
     }
 
@@ -154,13 +141,7 @@ public class Chama1Fragment extends Fragment implements AdapterView.OnItemSelect
                 Address loc = address.get(0);
                 loc.getLatitude();
                 loc.getLongitude();
-
-//                LatLng myLocal =
-                /* Centraliza a camera */
-                //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocal, 15));
                 return new LatLng(loc.getLatitude(), loc.getLongitude());
-//                myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title("CHUPAAAAA MUNDO!"));
-//                marcadoresPeladas.put("CHUPAAAAA MUNDO!", myMarker);
             }
         } catch (IOException e) {
             e.printStackTrace();

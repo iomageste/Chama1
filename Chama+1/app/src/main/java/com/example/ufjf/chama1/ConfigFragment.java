@@ -54,24 +54,8 @@ public class ConfigFragment extends Fragment {
         seekArea = (SeekBar) view.findViewById(R.id.seekArea);
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        com.google.firebase.database.Query queryRef = mFirebaseDatabaseReference.orderByChild("username").equalTo(currentUser.getUsername());
-        queryRef.addChildEventListener(new com.google.firebase.database.ChildEventListener() {
-
-            @Override
-            public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-                User user = dataSnapshot.getValue(User.class);
-                if(user != null) {
-                    checkBoxNotificacao.setChecked(user.isNotificacoes());
-                    seekArea.setProgress(user.getAreaBusca());
-                }
-            }
-            @Override public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) { }
-            @Override public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {}
-            @Override public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {}
-            @Override public void onCancelled(DatabaseError databaseError) {}
-        });
-
-        addListenerOnButton(view);
+        checkBoxNotificacao.setChecked(currentUser.isNotificacoes());
+        seekArea.setProgress(currentUser.getAreaBusca());
 
         return view;
     }

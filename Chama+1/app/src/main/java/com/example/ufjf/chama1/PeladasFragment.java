@@ -242,7 +242,6 @@ public class PeladasFragment extends Fragment implements
 
                 TextView lat_long = ((TextView) getView().findViewById(R.id.lat_long));
                 float distanciaKm = distancia[0] / 1000;
-                lat_long.setText("Distance" + distanciaKm);
 
                 if (distanciaKm > currentUser.getAreaBusca() || distanciaKm > pelada.getAreaBusca())
                     continue;
@@ -276,7 +275,6 @@ public class PeladasFragment extends Fragment implements
                     }
                 }
                 marcadoresPeladas.put(pelada.getUsername(), myMarker);
-
 
             }
         }

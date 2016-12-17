@@ -1,7 +1,5 @@
 package com.example.ufjf.chama1;
 
-
-import android.app.Application;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -19,26 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ufjf.model.User;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
 import com.google.android.gms.auth.api.Auth;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class PerfilFragment extends Fragment {
 
     TextView editUserName;
@@ -55,7 +40,6 @@ public class PerfilFragment extends Fragment {
     public PerfilFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,7 +74,7 @@ public class PerfilFragment extends Fragment {
                     }
                     @Override
                     public void onError() {
-                        //imageView.setImageResource(R.drawable.default_image);
+                        imageView.setImageResource(R.drawable.default_profile_image);
                     }
                 });
 
@@ -101,18 +85,10 @@ public class PerfilFragment extends Fragment {
         buttonSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                /*String new_name = editUserName.getText().toString();
-
-
-                Map<String, Object> updatedUser = new HashMap<String, Object>();
-                updatedUser.put("nome", new_name);
-                updatedUser.put("telefone", new_tel);
-                mFirebaseDatabaseReference.child("users").child(username).updateChildren(updatedUser);*/
                 String new_tel = editTelefone.getText().toString();
                 currentUser.setTelefone(new_tel);
                 mFirebaseDatabaseReference.child("users").child(currentUser.getUsername()).setValue(currentUser);
                 Toast.makeText(getContext(), "Seus dados de perfil foram atualizados.", Toast.LENGTH_SHORT).show();
-
             }
         });
 

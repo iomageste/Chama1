@@ -4,8 +4,6 @@ package com.example.ufjf.chama1;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,11 +20,6 @@ import android.widget.Toast;
 import com.example.ufjf.model.Contato;
 import com.example.ufjf.model.Solicitacao;
 import com.example.ufjf.model.User;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -47,30 +40,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class Chama1MapaFragment extends Fragment implements
         OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
-    private List<Solicitacao> novosPeladeiros;
     private Map<String, Marker> marcadoresPeladeiros;
     LatLng currentLoc;
-    int areaBusca;
     User currentUser;
+    int areaBusca;
     int usuariosFaltando;
+
+    private MapView gMapView;
+    private GoogleMap gMap = null;
 
     private DatabaseReference mFirebaseDatabaseReference;
 
+
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-        //private final View mWindow;
+
         private final View mContents;
 
         CustomInfoWindowAdapter(Bundle savedInstanceState) {
-            //mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
             mContents = getLayoutInflater(savedInstanceState).inflate(R.layout.custom_info_contents, null);
         }
 
@@ -111,10 +102,6 @@ public class Chama1MapaFragment extends Fragment implements
     }
 
 
-    private MapView gMapView;
-    private GoogleMap gMap = null;
-    Marker myMarker;
-
     public Chama1MapaFragment() {
         // Required empty public constructor
     }
@@ -127,8 +114,8 @@ public class Chama1MapaFragment extends Fragment implements
 
         areaBusca = Integer.parseInt(getArguments().getString("AreaBusca"));
         usuariosFaltando = Integer.parseInt(getArguments().getString("Chama+"));
-        //currentUser = getResources().getString(R.string.current_user);
         currentUser = ((CustomApplication) getActivity().getApplication()).getCurrentUser();
+        marcadoresPeladeiros = new HashMap<String, Marker>();
         Double lat = getArguments().getDouble("Lat");
         Double lng = getArguments().getDouble("Lng");
         currentLoc = new LatLng(lat, lng);
@@ -143,10 +130,7 @@ public class Chama1MapaFragment extends Fragment implements
             e.printStackTrace();
         }
 
-        novosPeladeiros = new ArrayList<>();
-        marcadoresPeladeiros = new HashMap<String, Marker>();
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-
         mFirebaseDatabaseReference.child("solicitacoes").addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
@@ -157,6 +141,7 @@ public class Chama1MapaFragment extends Fragment implements
                             && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
                             && !solicitacao.isAprovado()) {
 
+                        // Se a pelada já foi adicnada anteriormente, remove
                         for (String username : marcadoresPeladeiros.keySet()) {
                             if (solicitacao.getSolicitante_username().equals(username)) {
                                 marcadoresPeladeiros.get(username).remove();
@@ -169,15 +154,14 @@ public class Chama1MapaFragment extends Fragment implements
                                 solicitacao.getLatitude(), solicitacao.getLongitude(), results);
                         double distancia = results[0];
 
-                        // Somente exibe solicitação se ela estiver dentro da área de busca definida para
-                        // esta pelada
+                        // Somente exibe solicitação se ela estiver dentro da área de busca definida para esta pelada
                         if (distancia < Double.valueOf(areaBusca) || areaBusca == 0) {
                             BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.default_profile_image);
                             Bitmap b = bitmapdraw.getBitmap();
                             Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
 
                             LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
-                            myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                            Marker myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
                             for (User user : (((CustomApplication) getActivity().getApplication()).getUserList())) {
                                 if (user.getUsername().equals(solicitacao.getSolicitante_username())) {
                                     PicassoMarker marker = new PicassoMarker(myMarker);
@@ -187,10 +171,8 @@ public class Chama1MapaFragment extends Fragment implements
                             marcadoresPeladeiros.put(solicitacao.getSolicitante_username(), myMarker);
                         }
 
-
                     }
                 }
-
             }
 
             @Override
@@ -198,12 +180,7 @@ public class Chama1MapaFragment extends Fragment implements
             }
         });
 
-
-
-        // dispara notificações para usuários
-
         return view;
-
     }
 
 
@@ -212,7 +189,6 @@ public class Chama1MapaFragment extends Fragment implements
         gMap = googleMap;
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
         //gMap.setMyLocationEnabled(true);
-
         //gMap.setOnMyLocationChangeListener(myLocationChangeListener);
         //gMap.setOnMarkerClickListener(this);
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 15));
@@ -250,49 +226,12 @@ public class Chama1MapaFragment extends Fragment implements
     }
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
-        @Override
-        public void onMyLocationChange(Location location) {
-
-            for (Solicitacao solicitacao : novosPeladeiros) {
-                for (String username : marcadoresPeladeiros.keySet()) {
-                    if (solicitacao.getSolicitante_username().equals(username)) {
-                        marcadoresPeladeiros.get(username).remove();
-                        break;
-                    }
-                }
-
-                float[] results = new float[1];
-                Location.distanceBetween(currentLoc.latitude, currentLoc.longitude,
-                        solicitacao.getLatitude(), solicitacao.getLongitude(), results);
-                double distancia = results[0];
-
-                // Somente exibe solicitação se ela estiver dentro da área de busca definida para
-                // esta pelada
-                if (distancia < Double.valueOf(areaBusca) || areaBusca == 0) {
-                    int height = 100;
-                    int width = 100;
-                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.default_profile_image);
-                    Bitmap b = bitmapdraw.getBitmap();
-                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-
-                    LatLng myLocal = new LatLng(solicitacao.getLatitude(), solicitacao.getLongitude());
-                    myMarker = gMap.addMarker(new MarkerOptions().position(myLocal).title(solicitacao.getSolicitante_username()).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-                    for (User user : (((CustomApplication) getActivity().getApplication()).getUserList())) {
-                        if (user.getUsername().equals(solicitacao.getSolicitante_username())) {
-                            PicassoMarker marker = new PicassoMarker(myMarker);
-                            Picasso.with(getActivity()).load(user.getUser_image()).into(marker);
-                        }
-                    }
-                    marcadoresPeladeiros.put(solicitacao.getSolicitante_username(), myMarker);
-                }
-            }
-        }
+        @Override public void onMyLocationChange(Location location) {}
     };
 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Toast.makeText(getContext(), "TESTE", Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -321,7 +260,12 @@ public class Chama1MapaFragment extends Fragment implements
         mFirebaseDatabaseReference.child("contatos").child(solicitante + "-" + username_currentUser).setValue(contato2);
 
         // caso não falte mais usuarios, exclui a busca do bd e redirecina pra contatos
-        if (usuariosFaltando == 0) {
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("buscas/"+ username_currentUser +"/usuariosFaltando", usuariosFaltando);
+        if(usuariosFaltando > 0){
+            mFirebaseDatabaseReference.updateChildren(hashMap);
+        }
+        else {
             mFirebaseDatabaseReference.child("buscas").child(username_currentUser).removeValue();
             ViewPager view = (ViewPager) getActivity().findViewById(R.id.viewPager);
             view.setCurrentItem(4, true);

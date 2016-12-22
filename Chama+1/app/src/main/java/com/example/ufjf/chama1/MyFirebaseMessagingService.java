@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.example.ufjf.model.User;
 import com.google.firebase.messaging.FirebaseMessagingService;
 
 /**
@@ -19,23 +20,28 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void sendNotification(String messageBody, Activity currentActivity, Context currentContext) {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(currentActivity)
-                        .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                        .setContentTitle("Aplicativo Chama +1")
-                        .setContentText("Estão procurando jogadores em uma pelada!");
 
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                currentActivity,
-                0,
-                new Intent(currentActivity, MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
-        mBuilder.setContentIntent(contentIntent);
+        User currentUser = ((CustomApplication)currentActivity.getApplication()).getCurrentUser();
 
-        Notification notification = mBuilder.build();
-        NotificationManagerCompat.from(currentActivity).notify(0, notification);
+        if(currentUser != null && currentUser.isNotificacoes()) {
 
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(currentActivity)
+                            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                            .setContentTitle("Aplicativo Chama +1")
+                            .setContentText(messageBody);
 
+            PendingIntent contentIntent = PendingIntent.getActivity(
+                    currentActivity,
+                    0,
+                    new Intent(currentActivity, MainActivity.class),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            );
+            mBuilder.setContentIntent(contentIntent);
+
+            Notification notification = mBuilder.build();
+            NotificationManagerCompat.from(currentActivity).notify(0, notification);
+
+        }
     }
 }

@@ -136,7 +136,7 @@ public class PeladasFragment extends Fragment implements
                     if (pelada != null && !pelada.getUsername().equals(currentUser.getUsername())) {
                         novasPeladas.add(pelada);
                         MyFirebaseMessagingService svc = new MyFirebaseMessagingService();
-                        svc.sendNotification("MinhaMensagem", getActivity(), getContext());
+                        svc.sendNotification("Estão procurando jogadores em uma pelada!", getActivity(), getContext());
                     }
                 }
             }
@@ -259,7 +259,7 @@ public class PeladasFragment extends Fragment implements
                 LatLng myLocal = new LatLng(pelada.getLatitude(), pelada.getLongitude());
 
                 // Preenche texto do balão de acordo com a situação
-                String marketText = "Faltando: " + pelada.getUsuariosFaltando();
+                String marketText = "Faltando: " + pelada.getUsuariosFaltando()+ ", Tipo: "+pelada.getTipo();
                 for (Solicitacao sol : userSolicitacoes) {
                     if (sol.getUsername_busca().equals(pelada.getUsername()))
                         marketText = "Solicitação enviada...";

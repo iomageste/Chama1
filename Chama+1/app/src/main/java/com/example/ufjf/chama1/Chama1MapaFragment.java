@@ -138,7 +138,7 @@ public class Chama1MapaFragment extends Fragment implements
                 for (com.google.firebase.database.DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Solicitacao solicitacao = postSnapshot.getValue(Solicitacao.class);
                     if (solicitacao != null
-                            && !solicitacao.getSolicitante_username().equals(currentUser.getUid())
+                            && !solicitacao.getSolicitante_username().equals(currentUser.getUsername())
                             && !solicitacao.isAprovado()) {
 
                         // Se a pelada já foi adicnada anteriormente, remove
